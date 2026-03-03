@@ -13,7 +13,6 @@ Automatic EmmyLua type annotation generator for [LÖVE 2D](https://love2d.org/) 
 - [📦 Usage](#-usage)
   - [Using Pre-generated Files from Repository](#using-pre-generated-files-from-repository)
   - [Manual API Generation](#manual-api-generation)
-- [🧪 Testing](#-testing)
 - [🔄 Automatic Updates](#-automatic-updates)
 - [📋 What Gets Generated](#-what-gets-generated)
 - [🆚 Differences from Emmy-love-api](#-differences-from-emmy-love-api)
@@ -32,19 +31,30 @@ Automatic EmmyLua type annotation generator for [LÖVE 2D](https://love2d.org/) 
 
 - **GitHub Actions Automation** - API automatically updates when changes occur in the official [love-api](https://github.com/love2d-community/love-api)
 - **Ready-to-use Annotation Files** - `api/` folder contains ready-to-use files for all LÖVE modules
+- **Full API Coverage**: Generates complete LÖVE API with all modules
 
 ### Enhanced Type System
 
 - **Type Tracking** - automatic collection and validation of all types from the API
-- **Namespace Prefixes** - correct addition of `love.` prefix to API types
-- **Union Type Support** - handles `type1 or type2` → `type1 | type2`
+- **Smart Type Processing**
+  - Handles plural forms → arrays (e.g. "tables" → `table[]`)
+  - Handles unions and mixed plural/singular unions (e.g. "tables or strings" → `(table|string)[]`)
+  - Replaces `and` with `or` where appropriate during processing
+- **Namespace Prefixes** - correct addition of `love.` prefix to API types (builtins and descriptive types are not prefixed)
 - **Type Inheritance** - supports supertypes (e.g., `love.Drawable`)
-- **Table Types** - inline definitions `{field:type, ...}`
 
 ### Improved Generation
 
-- **Proper Optional Parameters** - marked as `type?` in annotations
-- **Default Value Information** - `(Defaults to <value>.)` in descriptions
+- **Best Practice Classes**
+  - Generates `@class` definitions following Emmylua conventions
+  - Class names use the form: `love.module.functionName.paramName` (the generator constructs names from the API data)
+  - Field formatting: ```---@field name? type Description (defaults to `value`)```
+  - First field always required
+
+- Important note about input API
+  - The generator is a parser: it takes identifiers and names from the source API files (e.g., `love_api.lua` and modules) verbatim and does not modify casing or rename symbols. We assume the provided API data is valid and follows the naming conventions you expect. If the source API contains PascalCase function names, the generated class names will reflect that.
+
+- **Proper Optional Parameters** - marked as `type?` when defaults are present
 - **Variant Sorting** - functions with the most arguments come first
 - **Overload Annotations** - correct generation of function overloads
 - **Varargs Support** - proper handling of `...` parameters
@@ -53,8 +63,6 @@ Automatic EmmyLua type annotation generator for [LÖVE 2D](https://love2d.org/) 
 ### Debug Mode
 
 - **DEBUG Mode** - detailed statistics on collected types
-- **Type Validation** - checks defined vs used types
-- **Automatic Testing** - test suite to verify generation
 
 ## 📦 Usage
 
@@ -102,7 +110,7 @@ lua genEmmyAPI.lua DEBUG "my_api"
 lua genEmmyAPI.lua HELP
 ```
 
-1. Add the library path to `.emmyrc.json` or configure your LSP server similarly, as shown below:
+* Add the library path to `.emmyrc.json` or configure your LSP server similarly, as shown below:
 
 ```json
 {
@@ -112,22 +120,7 @@ lua genEmmyAPI.lua HELP
 }
 ```
 
-1. Restart or reload your IDE
-
-## 🧪 Testing
-
-The repository includes a suite of automatic tests:
-
-```bash
-lua test/run_tests.lua
-```
-
-Tests verify:
-
-- Correct type generation
-- Namespace prefix validation
-- Proper handling of optional parameters
-- Overload annotation generation
+* Restart or reload your IDE
 
 ## 🔄 Automatic Updates
 
@@ -140,8 +133,7 @@ The workflow automatically:
 
 1. Clones the official love-api
 2. Generates EmmyLua annotations
-3. Runs tests
-4. Commits updates to the repository
+3. Commits updates to the repository
 
 ## 📋 What Gets Generated
 
@@ -179,13 +171,13 @@ Each file contains:
 ### Generation Improvements
 
 - ✅ Optional parameters properly marked (`type?`)
-- ✅ Default values in descriptions
-- ✅ Correct overload annotations
+- ✅ Default values in descriptions ```(defaults to `...`)```
+- - ✅ Correct overload annotations
 - ✅ Function variant sorting
 - ✅ Type inheritance support (supertypes)
 - ✅ Enums as `---@alias` instead of tables
 - ✅ Correct newlines around region comments
-- ✅ Class definitions before tables
+- ✅ Class definitions before functions
 - ✅ Enhanced type system with validation
 - ✅ DEBUG mode for type analysis
 - ✅ Custom output directory support
@@ -196,7 +188,6 @@ Each file contains:
 - ✅ Tabs replaced with spaces
 - ✅ Consistent indentation
 - ✅ No warnings in generated files
-- ✅ Automatic tests
 
 ## 🙏 Credits
 
@@ -205,7 +196,7 @@ Based on [Emmy-love-api](https://github.com/EmmyLua/Emmy-love-api).
 - **[@tangzx](https://github.com/tangzx)** - original script
 - **[@kindfulkirby](https://github.com/kindfulkirby)** - modifications and initial README
 - **[@NyakoFox](https://github.com/NyakoFox)** - update for modern EmmyLua
-- **[@yorik1984](https://github.com/yorik1984)** - enhanced type system, GitHub Actions, tests
+- **[@yorik1984](https://github.com/yorik1984)** - enhanced type system, GitHub Actions
 
 ## 📄 License
 

@@ -1,57 +1,63 @@
----@meta
----@namespace love
+---@meta love2d
 
 ---Provides an interface to the user's mouse.
+---
+---[Open in Browser](https://love2d.org/wiki/love.mouse)
+---
+---@class love.mouse
 love.mouse = {}
 
---region Cursor
+--region love.Cursor
 
 ---Represents a hardware cursor.
 ---
 ---[Open in Browser](https://love2d.org/wiki/Cursor)
 ---
----@class Cursor : Object
+---@class love.Cursor : love.Object
 local Cursor = {}
+
 ---Gets the type of the Cursor.
 ---
----[Open in Browser](https://love2d.org/wiki/Cursor.getType)
+---[Open in Browser](https://love2d.org/wiki/Cursor:getType)
 ---
----@return love.CursorType
+---@param self love.Cursor
+---@return love.CursorType ctype The type of the Cursor.
 function Cursor:getType() end
 
---endregion Cursor
+--endregion love.Cursor
 
 ---Types of hardware cursors.
 ---
 ---[Open in Browser](https://love2d.org/wiki/CursorType)
 ---
----@alias CursorType
----| "image" -- The cursor is using a custom image.
----| "arrow" -- An arrow pointer.
----| "ibeam" -- An I-beam, normally used when mousing over editable or selectable text.
----| "wait" -- Wait graphic.
----| "waitarrow" -- Small wait cursor with an arrow pointer.
----| "crosshair" -- Crosshair symbol.
----| "sizenwse" -- Double arrow pointing to the top-left and bottom-right.
----| "sizenesw" -- Double arrow pointing to the top-right and bottom-left.
----| "sizewe" -- Double arrow pointing left and right.
----| "sizens" -- Double arrow pointing up and down.
----| "sizeall" -- Four-pointed arrow pointing up, down, left, and right.
----| "no" -- Slashed circle or crossbones.
----| "hand" -- Hand symbol.
+---@alias love.CursorType
+---| "image" # The cursor is using a custom image.
+---| "arrow" # An arrow pointer.
+---| "ibeam" # An I-beam, normally used when mousing over editable or selectable text.
+---| "wait" # Wait graphic.
+---| "waitarrow" # Small wait cursor with an arrow pointer.
+---| "crosshair" # Crosshair symbol.
+---| "sizenwse" # Double arrow pointing to the top-left and bottom-right.
+---| "sizenesw" # Double arrow pointing to the top-right and bottom-left.
+---| "sizewe" # Double arrow pointing left and right.
+---| "sizens" # Double arrow pointing up and down.
+---| "sizeall" # Four-pointed arrow pointing up, down, left, and right.
+---| "no" # Slashed circle or crossbones.
+---| "hand" # Hand symbol.
 
 ---Gets the current Cursor.
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.mouse.getCursor)
 ---
----@return love.Cursor
+---@return love.Cursor cursor The current cursor, or nil if no cursor is set.
 function love.mouse.getCursor() end
 
 ---Returns the current position of the mouse.
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.mouse.getPosition)
 ---
----@return number, number
+---@return number x The position of the mouse along the x-axis.
+---@return number y The position of the mouse along the y-axis.
 function love.mouse.getPosition() end
 
 ---Gets whether relative mode is enabled for the mouse.
@@ -62,7 +68,7 @@ function love.mouse.getPosition() end
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.mouse.getRelativeMode)
 ---
----@return boolean
+---@return boolean enabled True if relative mode is enabled, false if it's disabled.
 function love.mouse.getRelativeMode() end
 
 ---Gets a Cursor object representing a system-native hardware cursor.
@@ -71,22 +77,23 @@ function love.mouse.getRelativeMode() end
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.mouse.getSystemCursor)
 ---
----@param ctype love.CursorType # The type of system cursor to get. 
----@return love.Cursor
+---The 'image' CursorType is not a valid argument. Use love.mouse.newCursor to create a hardware cursor using a custom image.
+---@param ctype love.CursorType The type of system cursor to get. 
+---@return love.Cursor cursor The Cursor object representing the system cursor type.
 function love.mouse.getSystemCursor(ctype) end
 
 ---Returns the current x-position of the mouse.
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.mouse.getX)
 ---
----@return number
+---@return number x The position of the mouse along the x-axis.
 function love.mouse.getX() end
 
 ---Returns the current y-position of the mouse.
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.mouse.getY)
 ---
----@return number
+---@return number y The position of the mouse along the y-axis.
 function love.mouse.getY() end
 
 ---Gets whether cursor functionality is supported.
@@ -95,7 +102,7 @@ function love.mouse.getY() end
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.mouse.isCursorSupported)
 ---
----@return boolean
+---@return boolean supported Whether the system has cursor functionality.
 function love.mouse.isCursorSupported() end
 
 ---Checks whether a certain mouse button is down.
@@ -104,23 +111,22 @@ function love.mouse.isCursorSupported() end
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.mouse.isDown)
 ---
----@param button number # The index of a button to check. 1 is the primary mouse button, 2 is the secondary mouse button and 3 is the middle button. Further buttons are mouse dependant.
----@vararg number # Additional button numbers to check.
----@return boolean
+---@param button number The index of a button to check. 1 is the primary mouse button, 2 is the secondary mouse button and 3 is the middle button. Further buttons are mouse dependant.
+---@return boolean down True if any specified button is down.
 function love.mouse.isDown(button, ...) end
 
 ---Checks if the mouse is grabbed.
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.mouse.isGrabbed)
 ---
----@return boolean
+---@return boolean grabbed True if the cursor is grabbed, false if it is not.
 function love.mouse.isGrabbed() end
 
 ---Checks if the cursor is visible.
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.mouse.isVisible)
 ---
----@return boolean
+---@return boolean visible True if the cursor to visible, false if the cursor is hidden.
 function love.mouse.isVisible() end
 
 ---Creates a new hardware Cursor object from an image file or ImageData.
@@ -131,37 +137,36 @@ function love.mouse.isVisible() end
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.mouse.newCursor)
 ---
----@param imageData love.ImageData # The ImageData to use for the new Cursor.
----@param hotx number? # The x-coordinate in the ImageData of the cursor's hot spot. (Defaults to 0.)
----@param hoty number? # The y-coordinate in the ImageData of the cursor's hot spot. (Defaults to 0.)
----@return love.Cursor
----@overload fun(filename:string, hotx:number?, hoty:number?):love.Cursor
----@overload fun(fileData:love.FileData, hotx:number?, hoty:number?):love.Cursor
+---@param imageData love.ImageData The ImageData to use for the new Cursor.
+---@param hotx number? The x-coordinate in the ImageData of the cursor's hot spot. (defaults to `0`.)
+---@param hoty number? The y-coordinate in the ImageData of the cursor's hot spot. (defaults to `0`.)
+---@return love.Cursor cursor The new Cursor object.
+---@overload fun(filename: string, hotx: number?, hoty: number?): love.Cursor
+---@overload fun(fileData: love.FileData, hotx: number?, hoty: number?): love.Cursor
 function love.mouse.newCursor(imageData, hotx, hoty) end
 
 ---Sets the current mouse cursor.
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.mouse.setCursor)
 ---
----@param cursor love.Cursor # The Cursor object to use as the current mouse cursor.
----
+---@param cursor love.Cursor The Cursor object to use as the current mouse cursor.
 ---Resets the current mouse cursor to the default.
----@overload fun():nil
+---@overload fun(): nil
 function love.mouse.setCursor(cursor) end
 
 ---Grabs the mouse and confines it to the window.
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.mouse.setGrabbed)
 ---
----@param grab boolean # True to confine the mouse, false to let it leave the window.
+---@param grab boolean True to confine the mouse, false to let it leave the window.
 function love.mouse.setGrabbed(grab) end
 
 ---Sets the current position of the mouse. Non-integer values are floored.
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.mouse.setPosition)
 ---
----@param x number # The new position of the mouse along the x-axis.
----@param y number # The new position of the mouse along the y-axis.
+---@param x number The new position of the mouse along the x-axis.
+---@param y number The new position of the mouse along the y-axis.
 function love.mouse.setPosition(x, y) end
 
 ---Sets whether relative mode is enabled for the mouse.
@@ -172,14 +177,14 @@ function love.mouse.setPosition(x, y) end
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.mouse.setRelativeMode)
 ---
----@param enable boolean # True to enable relative mode, false to disable it.
+---@param enable boolean True to enable relative mode, false to disable it.
 function love.mouse.setRelativeMode(enable) end
 
 ---Sets the current visibility of the cursor.
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.mouse.setVisible)
 ---
----@param visible boolean # True to set the cursor to visible, false to hide the cursor.
+---@param visible boolean True to set the cursor to visible, false to hide the cursor.
 function love.mouse.setVisible(visible) end
 
 ---Sets the current X position of the mouse.
@@ -188,7 +193,7 @@ function love.mouse.setVisible(visible) end
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.mouse.setX)
 ---
----@param x number # The new position of the mouse along the x-axis.
+---@param x number The new position of the mouse along the x-axis.
 function love.mouse.setX(x) end
 
 ---Sets the current Y position of the mouse.
@@ -197,6 +202,6 @@ function love.mouse.setX(x) end
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.mouse.setY)
 ---
----@param y number # The new position of the mouse along the y-axis.
+---@param y number The new position of the mouse along the y-axis.
 function love.mouse.setY(y) end
 

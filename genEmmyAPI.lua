@@ -1,7 +1,59 @@
 --[[
 EmmyLua LÖVE Generator
 
-A tool that automatically generates EmmyLua type annotations for the LÖVE 2D game framework API.
+A tool that automatically generates EmmyLua type annotations for the LÖVE 2D API.
+
+TYPE ANNOTATION RULES:
+This generator strictly follows the love_api.lua structure and applies
+consistent type processing rules. The description below matches the current
+implementation in this file (if you change the code, update this documentation).
+
+1. Plural forms (tables, strings, numbers) → array type with []
+   - "tables or strings" → (table|string)[]
+   - "tables" → table[]
+
+2. Singular forms (table, string, number) → simple type WITHOUT []
+   - "table or string" → table|string
+   - "table" → table
+
+3. Union types use '|' separator, NEVER 'or' in generated output
+   - The generator normalizes 'and' → 'or' before processing.
+
+4. Table types with fields are represented in the output. Depending on whether
+   fields have descriptions:
+   - If at least one field has a non-empty description, a `---@class` with
+     `---@field` lines will be generated (Best Practice style). The function
+     signature uses an inline record for compactness but the class is emitted
+     before the function and referenced in comments.
+   - If the table has fields but none of the fields contain descriptions,
+     the generator will prefer an inline record `{field: Type, ...}` in
+     signatures instead of creating a `@class`.
+   - If a table has no listed fields, the generator will keep the type as
+     `table` (unless an `arraytype` indicates an array type).
+
+5. Field is optional (with '?') ONLY if it has a 'default' value in the API.
+   - Optionality is expressed with `?` in `---@field`/`---@param` types (e.g.
+     `number?`). The textual annotation for defaults is appended as
+     "(defaults to `value`.)" by the implementation (see below).
+   - The helper that appends default text is appendDefaultDesc(desc, default):
+     it appends "(defaults to `value`.)" when default ~= nil and DOES NOT
+     automatically insert the word "optional". If you want "optional" in the
+     description, add it to the source description or change the helper.
+
+6. Determining which field/argument is considered the positional "first"
+   (affects requiredness / optional marking):
+   - The generator treats the first non-vararg element as the "first" positional
+     parameter/field. Concretely: it scans the list left-to-right for the first
+     entry with `name ~= "..."` and uses that index as the positional first.
+   - If no non-vararg element exists (rare; e.g. the list contains only `"..."`),
+     the generator falls back to using array position 1 as the first positional.
+   - This behavior prevents a leading vararg (`"..."`) from shifting the
+     positional-first semantics to a later element and causing incorrect
+     optional/required marking.
+
+7. Namespace prefix 'love.' is added to known API types (except builtins)
+
+For detailed rules see the DETAILED TYPE PROCESSING RULES section below.
 
 USAGE:
     lua genEmmyAPI.lua [OPTIONS] [OUTPUT_DIR]
@@ -48,31 +100,324 @@ OUTPUT:
     - Each file contains EmmyLua annotations compatible with IDEs supporting EmmyLua
 ]]
 
--- UTF-8 support
-os.execute("chcp 65001 > nul 2>&1")
+--[[
+================================================================================
+DETAILED TYPE PROCESSING RULES
+================================================================================
 
-local time = os.clock()
+This generator strictly binds to love_api.lua structure and applies the following
+processing rules to convert API data into valid EmmyLua annotations. The items
+below reflect the current implementation in this file.
 
-print("Requiring love_api")
+--------------------------------------------------------------------------------
+1. TYPE PROCESSING
+--------------------------------------------------------------------------------
 
-local api = require("love_api")
+1.1 Plural Forms (Multiple Items)
+    API: "tables"              → Output: table[]
+    API: "strings"             → Output: string[]
 
--- Get command and output directory from command line arguments
-local debugMode = false
-local outputDir = "api"
+1.2 Singular Forms (Single Item)
+    API: "table"               → Output: table
+    API: "string"              → Output: string
+    API: "number"              → Output: number
 
--- Parse arguments
-for i = 1, #arg do
-	local argument = arg[i]
-	if argument == "DEBUG" then
-		debugMode = true
-	elseif argument == "HELP" then
-		-- Show help and exit
-		local function printHelp()
-			print([[
+1.3 Union Types (All Plural)
+    API: "tables or strings"   → Output: (table|string)[]
+
+1.4 Union Types (All Singular)
+    API: "table or string"     → Output: table|string
+
+1.5 Mixed Union Types
+    API: "tables or string"    → Output: table[]|string
+
+--------------------------------------------------------------------------------
+2. NAMESPACE PREFIXES
+--------------------------------------------------------------------------------
+
+2.1 Builtin Types (NO prefix)
+    string, number, boolean, table, function, userdata, thread, nil
+
+2.2 Defined API Types (WITH 'love.' prefix)
+    API: "Canvas"              → Output: love.Canvas
+    API: "Image"               → Output: love.Image
+    API: "FilterType"          → Output: love.FilterType
+
+2.3 Types With Dot (NO changes)
+    API: "love.Canvas"         → Output: love.Canvas
+
+2.4 Table Types with Fields
+    If the API entry defines `table` with fields:
+      - If at least one field has a non-empty description, the generator emits a
+        `---@class` with `---@field` lines before the function (Best Practice).
+        The function signature still uses a compact inline record
+        `{field: Type, ...}` but the comment references the generated class.
+      - If fields exist but none have descriptions, the generator emits only an
+        inline record `{field: Type, ...}` in signatures and does not create
+        a `@class`.
+      - If there are no listed fields, the generator will keep the type as
+       `table` (unless an `arraytype` is present, in which case a `Type[]`
+        will be emitted).
+
+--------------------------------------------------------------------------------
+3. CLASS GENERATION FOR TABLES (BEST PRACTICE STYLE)
+--------------------------------------------------------------------------------
+
+3.1 When to Generate @class
+    The generator creates a `---@class` only when the table has fields and at
+    least one of the fields contains a non-empty description. This provides
+    useful IDE documentation without creating many empty or undocumented classes.
+
+    If you prefer the alternative behaviour "always generate @class when table
+    has fields", change the function `fieldsRequireClass` to return true
+    whenever `#fields > 0`.
+
+3.2 Class Naming Convention
+    Format: module.functionName.paramName
+
+    Note: the current implementation preserves the functionName case as it
+    appears in the API when forming the class name. If you prefer to always
+    lower-case the function name in class identifiers, update genClassName to
+    apply string.lower(functionName).
+
+    For parameters:  love.window.setMode.flags
+    For returns:     love.window.getMode.result (single return)
+                     love.window.getMode.result1, result2, ... (multiple)
+
+    Example:
+    ---Options for `love.window.setMode`.
+    ---@class love.window.setMode.flags
+
+3.3 Class Description (Best Practice)
+    - Short one-line description
+    - Mention function in backticks: `love.module.functionName`
+    - For params: "Options for `function`."
+    - For returns: "Result from `function`."
+
+3.4 Field Documentation (Best Practice)
+    Format: ---@field name? type Description (defaults to `value`)
+
+    Rules:
+    - NO '# ' separator (just space after type)
+    - Use first sentence from field.description
+    - Default in format: the implementation appends text in the form
+      "(defaults to `value`.)" when appropriate (appendDefaultDesc(desc, default))
+    - Values are shown in backticks
+
+    Example:
+    ---@field offset number? The offset of the subsection to copy, in bytes. (defaults to `0`.)
+    ---@field vsync? boolean Enable vertical sync (defaults to `true`.)
+
+3.5 Field Optionality in @class
+    ✅ Field is optional (with ?) ONLY when:
+       - field.default exists in API
+
+    ❌ Field is NOT optional (without ?) when:
+       - field.default does NOT exist in API
+
+    IMPORTANT IMPLEMENTATION DETAIL:
+    - The implementation determines the "first" required field by locating the
+      first non-vararg entry (first index where name ~= "...") and treats that
+      field as required (no '?'). If no non-vararg exists, the fallback is
+      index 1. This replaces any older wording that referenced a naive
+      i == 1 check.
+
+--------------------------------------------------------------------------------
+4. FUNCTION PARAMETERS
+--------------------------------------------------------------------------------
+
+4.1 Parameter Optionality
+    ✅ Parameter is optional (with ?) ONLY when:
+       - argument.default exists in API AND the argument is NOT the first
+         positional argument (first non-vararg index).
+
+    ❌ Parameter is NOT optional when:
+       - argument.default does NOT exist in API
+       - argument is the first non-vararg positional argument (treated as required).
+
+    Note: the code computes firstNonVarargIdx (first index with name ~= "...")
+    and uses that index in optionality checks. If no non-vararg exists,
+    index 1 is used as fallback. The older description that relied on argIdx == 1
+    without skipping varargs is superseded by this behavior.
+
+4.2 Table Parameter with Fields (class/inline behavior)
+    API: arguments = {
+        {
+            name = "settings",
+            type = "table",
+            default = "nil",
+            table = { ... }  -- has fields
+        }
+    }
+    Behaviour:
+      - If `settings.table` exists and at least one field has description, the
+        generator will produce a `---@class love.module.functionName.settings`
+        before the function and use a compact inline record `{...}` in the
+        @param signature while mentioning the class in the param comment.
+      - If `settings.table` exists but fields lack descriptions, the generator
+        will place an inline record `{field: Type,...}` directly in the @param
+        and will NOT emit `@class`.
+      - If `settings.table` is absent/empty, the generator attempts to reuse a
+       `return.table` or `return.arraytype` from the same variant; reuse ONLY
+        produces inline fields/class if the candidate return has real fields
+        (and class only if fields have descriptions). If the candidate has no
+        fields but has `arraytype`, it becomes `Type[]`. Otherwise the param
+        remains `table`.
+
+4.3 Parameter Description (Best Practice)
+    - Keep it short (first sentence)
+    - Add default info using appendDefaultDesc — the current implementation
+      appends the default text in the form "(defaults to `value`.)" where applicable.
+    - The textual word "optional" is not automatically inserted by the helper;
+      optionality is conveyed via the `?` type suffix.
+
+--------------------------------------------------------------------------------
+5. FUNCTION OVERLOADS
+--------------------------------------------------------------------------------
+
+5.1 Variant Sorting
+    1. By argument count (more → less)
+    2. If equal, by return count (more → less)
+
+5.2 First Variant = Main Signature
+    First variant:
+    ---@param x number
+    ---@param y number?
+    ---@return boolean name
+
+    Other variants:
+    ---@overload fun(x: number): nil
+
+5.3 Classes in Overloads
+    Overloads use the same @class names as main signature (when applicable)
+
+--------------------------------------------------------------------------------
+6. RETURN TYPES
+--------------------------------------------------------------------------------
+
+6.1 Table Return with Fields (class/inline behavior)
+    API: returns = {
+        {
+            type = "table",
+            table = {
+                { name = "width", type = "number" },
+                { name = "height", type = "number" }
+            }
+        }
+    }
+    Behaviour:
+      - If at least one field has a description, a `---@class` is generated
+        (e.g. love.module.functionName.result) and emitted before the function.
+        The @return line uses an inline `{...}` but the comment references
+        the generated class for field descriptions.
+      - If the fields do not contain descriptions, the generator emits an inline
+        record `{width: number, height: number}` in the @return and does NOT
+        generate a class.
+      - If `arraytype` is present and `ret.table` is empty, a `Type[]` is
+        emitted (e.g. love.RecordingDevice[]).
+
+6.2 Multiple Return Values
+    API: returns = {
+        { type = "number" },
+        { type = "number" },
+        { type = "table", table = {...} }
+    }
+    Output:
+    ---Result from `love.module.functionName`.
+    ---@class love.module.functionName.result3
+    ---@field ... ...
+
+    ---@return number
+    ---@return number
+    ---@return love.module.functionName.result3
+
+--------------------------------------------------------------------------------
+7. SPECIAL CASES
+--------------------------------------------------------------------------------
+
+7.1 Replace 'and' with 'or'
+    API: "tables and strings"   → Process as: "tables or strings"
+                                → Output: (table|string)[]
+
+7.2 Parameters with Commas in Name
+    API: arguments = {
+        { name = "x, y", type = "number" }
+    }
+    Output (expandParameters):
+    ---@param x number
+    ---@param y number
+
+7.3 Types Already with '|' (after processTypeString)
+    Processing: "table|string"
+              - Split by |
+              - Add namespace to each part
+              - Join back
+    Output: "table|love.String" (if String in knownTypes)
+
+--------------------------------------------------------------------------------
+8. TYPE PROCESSING PRIORITIES
+--------------------------------------------------------------------------------
+
+Priority order (first match wins):
+1. Table with described fields AND at least one field description → Generate
+   @class + inline record in signature
+2. Table with fields but NO field descriptions → Emit inline record `{...}`
+   (no @class)
+3. Union type (with "or"/"and") → Process with processTypeString
+4. Simple type                → Add namespace prefix
+
+--------------------------------------------------------------------------------
+9. EXCLUSIONS (NOT PROCESSED)
+--------------------------------------------------------------------------------
+
+9.1 DON'T add namespace to:
+    - Builtin types: string, number, boolean, table, function, userdata, light userdata, thread, nil
+    - Types with dot: "love.Canvas"
+    - Class names: "love.module.functionName.paramName"
+
+9.2 DON'T process with processTypeString:
+    - Class names
+
+--------------------------------------------------------------------------------
+10. DEBUG MODE
+--------------------------------------------------------------------------------
+
+10.1 Usage: lua genEmmyAPI.lua DEBUG
+
+Shows:
+- All collected types (knownTypes)
+- Plural forms: "tables" → table[]
+- Defined types (with prefix): love.Canvas, love.Image, ...
+- Undefined types (used but not defined in API)
+
+--------------------------------------------------------------------------------
+11. PROCESSING PIPELINE
+--------------------------------------------------------------------------------
+
+API data → collectTypes() → knownTypes, definedTypes
+                                   ↓
+                        processTypeString()
+                          ↓              ↓
+                   plural forms    union types
+                       ↓                ↓
+                  addNamespaceToType()
+                       ↓
+                genClassForTable() (only when fields have descriptions)
+                       ↓
+                 genFunction()
+                       ↓
+                OUTPUT: api/*.lua
+
+================================================================================
+END OF DETAILED TYPE PROCESSING RULES
+================================================================================
+]]
+
+local HELP_TEXT = [[
+
 EmmyLua LÖVE Generator
 
-A tool that automatically generates EmmyLua type annotations for the LÖVE 2D game framework API.
+A tool that automatically generates EmmyLua type annotationsfor the LÖVE 2D API.
 
 USAGE:
     lua genEmmyAPI.lua [OPTIONS] [OUTPUT_DIR]
@@ -91,11 +436,6 @@ COMMANDS:
                        Examples:
                            lua genEmmyAPI.lua "my_api"
                            lua genEmmyAPI.lua "./custom/path/api"
-
-    HELP              - Display this help message
-
-                       Example:
-                           lua genEmmyAPI.lua HELP
 
 EXAMPLES:
     # Generate full API to default directory
@@ -117,734 +457,1301 @@ OUTPUT:
     - Generated API is placed in specified directory (default: api/)
     - Files are organized as: <output_dir>/<module>.lua
     - Each file contains EmmyLua annotations compatible with IDEs supporting EmmyLua
-]])
-		end
-		printHelp()
-		os.exit(0)
-	else
-		-- Treat as output directory
-		outputDir = argument
-	end
+]]
+
+local INTRO_TEXT = "EmmyLua LÖVE Generator. Run 'lua genEmmyAPI.lua HELP' to view usage."
+
+-- Best-effort UTF-8 on Windows
+pcall(function()
+    os.execute("chcp 65001 > nul 2>&1")
+end)
+
+local time         = os.clock()
+
+--------------------------------------------------------------------------------
+-- Type discovery
+--------------------------------------------------------------------------------
+local apiName      = "love"
+local apiEngine    = "love2d"
+local apiFile      = "love_api"
+local apiFileExt   = "lua"
+local fileExt      = "lua"
+local wikiLinkName = "Open in Browser"
+local wikiLinkUrl  = "https://love2d.org/wiki/"
+
+local builtinTypes = {
+    ['any']               = true,
+    ['boolean']           = true,
+    ['function']          = true,
+    ['integer']           = true,
+    ['lightuserdata']     = true,
+    ['nil']               = true,
+    ['number']            = true,
+    ['string']            = true,
+    ['table']             = true,
+    ['thread']            = true,
+    ['userdata']          = true,
+    -- alias type like defined types
+    ['Variant']           = true,
+    ['cdata']             = true,
+    ['RenderTargetSetup'] = true,
+}
+
+local knownTypes   = {}
+local definedTypes = {}
+local pluralTypes  = {
+    ["strings"] = "string",
+    ["tables"]  = "table",
+}
+local aliasType    = {
+    ['Variant']           = 'any',
+    ['cdata']             = 'any',
+    ['RenderTargetSetup'] = 'any',
+}
+
+--------------------------------------------------------------------------------
+-- Utilities
+--------------------------------------------------------------------------------
+local function isEmpty(s)
+    return s == nil or (type(s) == "string" and s:match("^%s*$") ~= nil)
 end
 
-local function safeDesc(src, prefix)
-	prefix = prefix or ""
-	return "---" .. string.gsub(src, "\n", "\n" .. prefix .. "---")
+local function first_sentence(s)
+    if isEmpty(s) then
+        return ""
+    end
+    -- full string or up to first newline, whichever comes first
+    local m = s:match("^(.-)\n") or s
+    return m and m or s
+end
+
+local function trim(s)
+    if isEmpty(s) then
+        return ""
+    end
+
+    return first_sentence(s)
+end
+
+local function trimParam(s)
+    if isEmpty(s) then
+        return ""
+    end
+
+    -- replace every remaining single newline with "\n---"
+    return s:gsub("\n", "\n---")
+end
+
+local function safeDesc(src)
+    if isEmpty(src) then
+        return ""
+    end
+    return "---" .. src:gsub("\n", "\n---")
 end
 
 local function stripNewlines(src)
-	return string.gsub(src, "\n", " ")
+    if isEmpty(src) then
+        return ""
+    end
+    return string.gsub(src, "\n", " ")
 end
 
 local function countTable(t)
-	local count = 0
-	for _ in pairs(t) do
-		count = count + 1
-	end
-	return count
+    local count = 0
+    for _ in pairs(t) do
+        count = count + 1
+    end
+    return count
 end
 
--- Build a set of all known types from the API
-local knownTypes = {}
-local definedTypes = {}
-local descriptiveTypes = {}
-
--- List of Lua built-in types that should not have love. prefix
-local builtinTypes = {
-	["string"] = true,
-	["number"] = true,
-	["boolean"] = true,
-	["table"] = true,
-	["function"] = true,
-	["userdata"] = true,
-	["thread"] = true,
-	["nil"] = true,
-}
-
--- Normalize type by removing plural 's' if base type is standard
-local function normalizeType(typeStr)
-	-- Remove leading/trailing spaces
-	typeStr = string.gsub(typeStr, "^%s+|%s+$", "")
-
-	-- Check if it ends with 's' and removing it gives a standard type
-	if string.len(typeStr) > 1 and string.sub(typeStr, -1) == "s" then
-		local baseType = string.sub(typeStr, 1, -2)
-		-- Check if base type is builtin or known
-		if builtinTypes[baseType] or knownTypes[baseType] then
-			return baseType
-		end
-	end
-
-	return typeStr
+local function createDirectory(path)
+    local current = ""
+    for part in string.gmatch(path, "[^/\\]+") do
+        current = current .. part
+        os.execute("mkdir " .. current .. " 2>nul || true")
+        current = current .. "/"
+    end
 end
 
--- Process type string: replace 'and' with 'or', normalize plurals
-local function processTypeString(typeStr)
-	-- Replace 'and' with 'or' for consistent processing
-	typeStr = string.gsub(typeStr, " and ", " or ")
-
-	-- Split by 'or' and normalize each part
-	local parts = {}
-	for part in string.gmatch(typeStr, "[^%s]+") do
-		if part ~= "or" then
-			local normalized = normalizeType(part)
-			table.insert(parts, normalized)
-		end
-	end
-
-	-- Reconstruct with ' or '
-	if #parts > 1 then
-		return table.concat(parts, " or ")
-	elseif #parts == 1 then
-		return parts[1]
-	else
-		return typeStr
-	end
+-- Return the separator used between module/type and function name.
+-- love.window.setMode -> delimiter(true) == "."
+-- RecordingDevice:getBitDepth -> delimiter(false) == ":"
+local function delimiter(static)
+    if static == false then return ":" end
+    return "."
 end
 
+local function isIdentifier(s)
+    local local_keywords = {
+        ["and"]      = true,
+        ["break"]    = true,
+        ["do"]       = true,
+        ["else"]     = true,
+        ["elseif"]   = true,
+        ["end"]      = true,
+        ["false"]    = true,
+        ["for"]      = true,
+        ["function"] = true,
+        ["goto"]     = true,
+        ["if"]       = true,
+        ["in"]       = true,
+        ["local"]    = true,
+        ["nil"]      = true,
+        ["not"]      = true,
+        ["or"]       = true,
+        ["repeat"]   = true,
+        ["return"]   = true,
+        ["then"]     = true,
+        ["true"]     = true,
+        ["until"]    = true,
+        ["while"]    = true
+    }
+    return type(s) == "string"
+        and s:match("^[_%a][_%w]*$")
+        and not local_keywords[s]
+end
+
+local function convertStringToParam(s)
+    if type(s) ~= "string" then return s end
+    local singleQuoted = s:match("^'(.*)'$")
+    if singleQuoted then return singleQuoted end
+    local doubleQuoted = s:match('^"(.*)"$')
+    if doubleQuoted then return doubleQuoted end
+    return s
+end
+
+local function keyConvert(key)
+    local t = type(key)
+    if t == "number" or t == "boolean" then
+        return "[" .. tostring(key) .. "]"
+    end
+    if t ~= "string" then
+        key = tostring(key)
+    end
+
+    if isIdentifier(key) then
+        return key
+    end
+
+    return "[" .. string.format("%q", key) .. "]"
+end
+
+local function aliasTypeToDef(mapping)
+    local code = ""
+    for alias, value in pairs(mapping) do
+        code = code .. "---@alias " .. tostring(alias) .. " " .. tostring(value) .. "\n"
+    end
+    return code
+end
+--------------------------------------------------------------------------------
+-- CLI
+--------------------------------------------------------------------------------
+local debugMode = false
+local outputDir = "api"
+
+for i = 1, #arg do
+    local a = arg[i]
+    if a == "DEBUG" then
+        debugMode = true
+    elseif a == "HELP" then
+        io.write(HELP_TEXT, "\n")
+        os.exit(0)
+    else
+        io.write(INTRO_TEXT, "\n")
+        outputDir = a
+    end
+end
+createDirectory(outputDir)
+
+--------------------------------------------------------------------------------
+-- Load love_api
+--------------------------------------------------------------------------------
+local ok, apiRequire = pcall(function()
+    return require(apiFile)
+end)
+if not ok then
+    io.stderr:write(
+        "Error: could not require '"
+        .. apiFile
+        .. "'. Make sure "
+        .. apiFile
+        .. "."
+        .. apiFileExt
+        .. " is present in package.path\n"
+    )
+    os.exit(1)
+end
+
+--------------------------------------------------------------------------------
+-- Tokenizer & type helpers
+--------------------------------------------------------------------------------
+local function tokenizePreserveQuoted(s)
+    if not s then
+        return {}
+    end
+    local tokens = {}
+    local i = 1
+    local n = #s
+
+    while i <= n do
+        local c = s:sub(i, i)
+
+        if c == '"' or c == "'" then
+            local quote = c
+            local j = i + 1
+            while j <= n do
+                local ch = s:sub(j, j)
+                if ch == "\\" then
+                    j = j + 2
+                elseif ch == quote then
+                    break
+                else
+                    j = j + 1
+                end
+            end
+            if j > n then
+                tokens[#tokens + 1] = s:sub(i, n)
+                i = n + 1
+            else
+                tokens[#tokens + 1] = s:sub(i, j)
+                i = j + 1
+            end
+        elseif c == "(" then
+            local depth = 1
+            local j = i + 1
+            while j <= n and depth > 0 do
+                local ch = s:sub(j, j)
+                if ch == "(" then
+                    depth = depth + 1
+                elseif ch == ")" then
+                    depth = depth - 1
+                end
+                j = j + 1
+            end
+            tokens[#tokens + 1] = s:sub(i, math.min(j - 1, n))
+            i = j
+        else
+            local word = s:match("^[^%s]+", i)
+            if not word then
+                break
+            end
+            tokens[#tokens + 1] = word
+            i = i + #word
+        end
+
+        local ws = s:match("^%s*", i)
+        i = i + #ws
+    end
+
+    return tokens
+end
+
+local function isPlural(typeStr, kts)
+    kts = kts or knownTypes
+    local base = typeStr and typeStr:match("(.+)s$")
+    if base and (builtinTypes[base] or kts[base]) then
+        return true, base
+    end
+    return false, typeStr
+end
+
+local function processTypeString(typeStr, kts)
+    if not typeStr or typeStr == "" then
+        return "any"
+    end
+    kts = kts or knownTypes
+
+    local normalized = typeStr:gsub("%s+and%s+", " or ")
+    local tokens = tokenizePreserveQuoted(normalized)
+
+    local parts = {}
+    local cur = {}
+    for _, tok in ipairs(tokens) do
+        if tok == "or" then
+            parts[#parts + 1] = cur
+            cur = {}
+        else
+            cur[#cur + 1] = tok
+        end
+    end
+    parts[#parts + 1] = cur
+
+    local out = {}
+    local allPlural = true
+
+    local function processPart(part)
+        if #part == 0 then
+            allPlural = false
+            return "any"
+        end
+        if #part > 1 then
+            allPlural = false
+            return table.concat(part, " ")
+        end
+
+        local tok = part[1]
+        if tok:match('^".*"$') or tok:match("^'.*'$") then
+            allPlural = false
+            return tok
+        end
+
+        local plural, base = isPlural(tok, kts)
+        if plural then
+            return base .. "[]"
+        else
+            allPlural = false
+            return tok
+        end
+    end
+
+    for _, part in ipairs(parts) do
+        out[#out + 1] = processPart(part)
+    end
+
+    if #out == 1 then
+        return out[1]
+    end
+
+    if allPlural then
+        local bases = {}
+        for _, v in ipairs(out) do
+            bases[#bases + 1] = v:gsub("%[%]$", "")
+        end
+        return "(" .. table.concat(bases, "|") .. ")[]"
+    end
+
+    return table.concat(out, "|")
+end
+
+local function addNamespaceToType(typeStr)
+    if not typeStr or typeStr == "" then
+        return "any"
+    end
+
+    local trim_local = trim or function(s)
+        return (s:gsub("^%s*(.-)%s*$", "%1"))
+    end
+
+    if typeStr:match('^".*"$') or typeStr:match("^'.*'$") then
+        return typeStr
+    end
+
+    local function mapParts(s)
+        local parts = {}
+        for part in s:gmatch("([^|]+)") do
+            parts[#parts + 1] = addNamespaceToType(trim_local(part))
+        end
+        return parts
+    end
+
+    local unionArray = typeStr:match("^%((.+)%)%[%]$")
+    if unionArray then
+        return "(" .. table.concat(mapParts(unionArray), "|") .. ")[]"
+    end
+
+    local compactKey = typeStr:gsub("%s+", "")
+    if type(builtinTypes) == "table" and (builtinTypes[compactKey] or builtinTypes[typeStr]) then
+        return compactKey
+    end
+
+    local base = typeStr:match("^(.-)%[%]$")
+    if base then
+        return addNamespaceToType(trim_local(base)) .. "[]"
+    end
+
+    if typeStr:find("|", 1, true) then
+        return table.concat(mapParts(typeStr), "|")
+    end
+
+    -- fast rejects / keep-as-is cases
+    if type(builtinTypes) == "table" and builtinTypes[typeStr] then
+        return typeStr
+    end
+    if typeStr:find("%s") then
+        return typeStr
+    end
+    if typeStr:find("%.") or typeStr:find("{ ", 1, true) then
+        return typeStr
+    end
+
+    if (knownTypes and knownTypes[typeStr]) or (definedTypes and definedTypes[typeStr]) then
+        return apiName .. "." .. typeStr
+    end
+
+    if typeStr:lower() == "any" then
+        return "any"
+    end
+
+    return typeStr
+end
+
+local function proc(t)
+    -- normalize and namespace a raw type string
+    return addNamespaceToType(processTypeString(t or "any", knownTypes))
+end
+
+--------------------------------------------------------------------------------
+-- Collect known types from API
+--------------------------------------------------------------------------------
 local function collectTypesFromVariant(variant)
-	-- Collect types from arguments
-	if variant.arguments then
-		for _, argument in ipairs(variant.arguments) do
-			if argument.type then
-				-- First check if it has ' or ' or ' and '
-				if string.find(argument.type, " or ") or string.find(argument.type, " and ") then
-					-- Process union types
-					local processedType = processTypeString(argument.type)
-					local types = {}
-					for part in string.gmatch(processedType, "[^%s|]+") do
-						if part ~= "or" then
-							table.insert(types, part)
-						end
-					end
-					for _, t in ipairs(types) do
-						knownTypes[t] = true
-					end
-				else
-					-- No 'or'/'and', check if it has spaces (descriptive)
-					if string.find(argument.type, " ") then
-						descriptiveTypes[argument.type] = true
-					else
-						-- Single type
-						knownTypes[argument.type] = true
-					end
-				end
-			end
-			-- Collect types from table fields in arguments
-			if argument.table then
-				for _, field in ipairs(argument.table) do
-					if field.type then
-						if string.find(field.type, " or ") or string.find(field.type, " and ") then
-							local processedType = processTypeString(field.type)
-							local types = {}
-							for part in string.gmatch(processedType, "[^%s|]+") do
-								if part ~= "or" then
-									table.insert(types, part)
-								end
-							end
-							for _, t in ipairs(types) do
-								knownTypes[t] = true
-							end
-						else
-							if string.find(field.type, " ") then
-								descriptiveTypes[field.type] = true
-							else
-								knownTypes[field.type] = true
-							end
-						end
-					end
-				end
-			end
-		end
-	end
+    if not variant then
+        return
+    end
 
-	-- Collect types from returns
-	if variant.returns then
-		for _, ret in ipairs(variant.returns) do
-			if ret.type then
-				if string.find(ret.type, " or ") or string.find(ret.type, " and ") then
-					local processedType = processTypeString(ret.type)
-					local types = {}
-					for part in string.gmatch(processedType, "[^%s|]+") do
-						if part ~= "or" then
-							table.insert(types, part)
-						end
-					end
-					for _, t in ipairs(types) do
-						knownTypes[t] = true
-					end
-				else
-					if string.find(ret.type, " ") then
-						descriptiveTypes[ret.type] = true
-					else
-						knownTypes[ret.type] = true
-					end
-				end
-			end
-			-- Collect types from table fields in returns
-			if ret.table then
-				for _, field in ipairs(ret.table) do
-					if field.type then
-						if string.find(field.type, " or ") or string.find(field.type, " and ") then
-							local processedType = processTypeString(field.type)
-							local types = {}
-							for part in string.gmatch(processedType, "[^%s|]+") do
-								if part ~= "or" then
-									table.insert(types, part)
-								end
-							end
-							for _, t in ipairs(types) do
-								knownTypes[t] = true
-							end
-						else
-							if string.find(field.type, " ") then
-								descriptiveTypes[field.type] = true
-							else
-								knownTypes[field.type] = true
-							end
-						end
-					end
-				end
-			end
-		end
-	end
+    local function addKnownFromProcessed(processed)
+        for base in processed:gmatch("([%w_]+)") do
+            knownTypes[base] = true
+        end
+    end
+
+    local function collectType(typeStr)
+        if not typeStr or typeStr == "" then
+            return
+        end
+        if typeStr:find(" or ", 1, true) or typeStr:find(" and ", 1, true) then
+            addKnownFromProcessed(processTypeString(typeStr, knownTypes))
+        else
+            local plural, base = isPlural(typeStr, knownTypes)
+            if plural then
+                pluralTypes[typeStr] = base
+            end
+            knownTypes[base or typeStr] = true
+        end
+    end
+
+    local function collectFieldsList(list)
+        for _, item in ipairs(list) do
+            collectType(item.type)
+            if item.table then
+                for _, f in ipairs(item.table) do
+                    collectType(f.type)
+                end
+            end
+        end
+    end
+
+    if variant.arguments then
+        collectFieldsList(variant.arguments)
+    end
+
+    if variant.returns then
+        for _, r in ipairs(variant.returns) do
+            collectType(r.type)
+            if r.table then
+                for _, f in ipairs(r.table) do
+                    collectType(f.type)
+                end
+            end
+            if r.arraytype and r.arraytype ~= "" then
+                knownTypes[r.arraytype] = true
+            end
+        end
+    end
 end
 
 local function collectTypes(module)
-	if module.types then
-		for _, type in ipairs(module.types) do
-			knownTypes[type.name] = true
-			definedTypes[type.name] = true
-		end
-	end
-	if module.enums then
-		for _, enum in ipairs(module.enums) do
-			knownTypes[enum.name] = true
-			definedTypes[enum.name] = true
-		end
-	end
-	if module.functions then
-		for _, fun in ipairs(module.functions) do
-			if fun.variants then
-				for _, variant in ipairs(fun.variants) do
-					collectTypesFromVariant(variant)
-				end
-			end
-		end
-	end
-	if module.modules then
-		for _, m in ipairs(module.modules) do
-			collectTypes(m)
-		end
-	end
+    if not module then
+        return
+    end
+
+    local function addDefined(list)
+        for _, item in ipairs(list or {}) do
+            knownTypes[item.name] = true
+            definedTypes[item.name] = true
+        end
+    end
+
+    addDefined(module.types)
+    addDefined(module.enums)
+
+    for _, f in ipairs(module.functions or {}) do
+        for _, v in ipairs(f.variants or {}) do
+            collectTypesFromVariant(v)
+        end
+    end
+
+    for _, m in ipairs(module.modules or {}) do
+        collectTypes(m)
+    end
 end
 
-collectTypes(api)
+collectTypes(apiRequire)
 
--- Add module namespace prefix to defined type
-local function addNamespaceToDefinedType(type)
-	-- If type already has a dot - don't modify
-	if string.find(type, "%.") then
-		return type
-	end
+-- Ensure common plural forms are recorded so DEBUG shows them (per your example)
+local function printDebugInfo()
+    print("DEBUG: All collected types (" .. countTable(knownTypes) .. " total):")
+    local tmp = {}
+    for k in pairs(knownTypes) do
+        tmp[#tmp + 1] = k
+    end
+    table.sort(tmp)
+    for _, v in ipairs(tmp) do
+        print("  - " .. v)
+    end
+    print("")
 
-	-- If type is in defined types - add love. prefix
-	if definedTypes[type] then
-		return "love." .. type
-	end
+    print("DEBUG: Plural forms found in API (will be converted to arrays):")
+    local tmpPlural = {}
+    for k, v in pairs(pluralTypes) do
+        tmpPlural[#tmpPlural + 1] = { k = k, v = v }
+    end
+    table.sort(tmpPlural, function(a, b)
+        return a.k < b.k
+    end)
+    for _, it in ipairs(tmpPlural) do
+        print("  - " .. it.k .. " → " .. it.v .. "[]")
+    end
+    print("Total plural forms: " .. countTable(pluralTypes))
+    print("")
 
-	-- Unknown type - return as is
-	return type
+    print("DEBUG: Types starting with capital letter (defined in type files):")
+    local definedCap = {}
+    for k in pairs(definedTypes) do
+        local first = k:sub(1, 1)
+        if first == first:upper() and first ~= first:lower() then
+            definedCap[#definedCap + 1] = k
+        end
+    end
+    table.sort(definedCap)
+    for _, v in ipairs(definedCap) do
+        print("  - " .. apiName .. "." .. v)
+    end
+    print("Total defined capital letter types: " .. #definedCap)
+    print("")
+
+    print("DEBUG: Types starting with capital letter (used but NOT defined):")
+    local undef = {}
+    for k in pairs(knownTypes) do
+        if not definedTypes[k] then
+            local first = k:sub(1, 1)
+            if first == first:upper() and first ~= first:lower() then
+                undef[#undef + 1] = k
+            end
+        end
+    end
+    table.sort(undef)
+    local seen = {}
+    for _, v in ipairs(undef) do
+        if not seen[v] then
+            print("  - " .. (knownTypes[v] and (apiName .. "." .. v) or v))
+            seen[v] = true
+        end
+    end
+    print("Total undefined capital letter types: " .. countTable(seen))
+    print("")
 end
 
--- Add module namespace prefix to any known type
-local function addNamespaceToAnyType(type)
-	-- If type already has a dot - don't modify
-	if string.find(type, "%.") then
-		return type
-	end
-
-	-- If type is in known types - add love. prefix
-	if knownTypes[type] then
-		return "love." .. type
-	end
-
-	-- Unknown type - return as is
-	return type
-end
-
--- Print debug information if DEBUG mode is enabled
 if debugMode then
-	print("DEBUG: All collected types (" .. countTable(knownTypes) .. " total):")
-	local sortedTypes = {}
-	for typeName, _ in pairs(knownTypes) do
-		table.insert(sortedTypes, typeName)
-	end
-	table.sort(sortedTypes)
-	for _, typeName in ipairs(sortedTypes) do
-		print("  - " .. typeName)
-	end
-	print("")
-
-	print("DEBUG: Descriptive types (with spaces, not prefixed):")
-	local sortedDescriptiveTypes = {}
-	for typeName, _ in pairs(descriptiveTypes) do
-		table.insert(sortedDescriptiveTypes, typeName)
-	end
-	table.sort(sortedDescriptiveTypes)
-	for _, typeName in ipairs(sortedDescriptiveTypes) do
-		print("  - " .. typeName)
-	end
-	print("Total descriptive types: " .. countTable(descriptiveTypes))
-	print("")
-
-	print("DEBUG: Types starting with capital letter (defined in type files):")
-	local definedCapitalTypes = {}
-	for typeName, _ in pairs(definedTypes) do
-		local firstChar = string.sub(typeName, 1, 1)
-		if firstChar == string.upper(firstChar) and firstChar ~= string.lower(firstChar) then
-			table.insert(definedCapitalTypes, typeName)
-		end
-	end
-	table.sort(definedCapitalTypes)
-	for _, typeName in ipairs(definedCapitalTypes) do
-		print("  - " .. addNamespaceToDefinedType(typeName))
-	end
-	print("Total defined capital letter types: " .. #definedCapitalTypes)
-	print("")
-
-	print("DEBUG: Types starting with capital letter (used but NOT defined):")
-	local undefinedCapitalTypes = {}
-	for typeName, _ in pairs(knownTypes) do
-		if not definedTypes[typeName] then
-			local firstChar = string.sub(typeName, 1, 1)
-			if firstChar == string.upper(firstChar) and firstChar ~= string.lower(firstChar) then
-				table.insert(undefinedCapitalTypes, typeName)
-			end
-		end
-	end
-	table.sort(undefinedCapitalTypes)
-	-- Remove duplicates
-	local seen = {}
-	for _, typeName in ipairs(undefinedCapitalTypes) do
-		if not seen[typeName] then
-			print("  - " .. addNamespaceToAnyType(typeName))
-			seen[typeName] = true
-		end
-	end
-	print("Total undefined capital letter types: " .. countTable(seen))
-	print("")
+    printDebugInfo()
 end
 
--- Add module namespace prefix to type if needed
-local function addNamespaceToType(type)
-	-- If type already has a dot or is a table type - don't modify
-	if string.find(type, "%.") or string.find(type, "{") then
-		return type
-	end
-
-	-- If type is a built-in Lua type - don't add prefix
-	if builtinTypes[type] then
-		return type
-	end
-
-	-- If type is descriptive (contains spaces) - don't add prefix
-	if descriptiveTypes[type] then
-		return type
-	end
-
-	-- If type is in known API types - add love. prefix
-	if knownTypes[type] then
-		return "love." .. type
-	end
-
-	-- Unknown type - return as is
-	return type
-end
-
-local function getReturnType(ret)
-	-- Include fields with their types when the return type is a table with known fields and types
-	if ret.table then
-		local s = "{"
-		for i, field in ipairs(ret.table) do
-			local fieldType = addNamespaceToType(field.type)
-			local decl = field.name .. ":" .. fieldType
-			if i == 1 then
-				s = s .. decl
-			else
-				s = s .. ", " .. decl
-			end
-		end
-		s = s .. "}"
-		return s
-	else
-		-- Check if it's a descriptive type first
-		if descriptiveTypes[ret.type] then
-			-- It's a descriptive type - use as is
-			return ret.type
-		else
-			-- Handle return type - process it first
-			local returnType = processTypeString(ret.type)
-
-			-- Replace 'or' with '|'
-			returnType = string.gsub(returnType, " or ", " | ")
-
-			-- Process each type in the union
-			returnType = string.gsub(returnType, "(%w+)", function(word)
-				return addNamespaceToType(word)
-			end)
-
-			return returnType
-		end
-	end
-end
-
-local function genReturns(variant)
-	local returns = variant.returns
-	local s = ""
-	local num = 0
-	if returns and #returns > 0 then
-		num = #returns
-		for i, ret in ipairs(returns) do
-			if i == 1 then
-				s = getReturnType(ret)
-			else
-				s = s .. ", " .. getReturnType(ret)
-			end
-		end
-	else
-		s = "nil"
-	end
-	return s, num
-end
-
--- Split parameter names by comma and create separate parameter entries
+--------------------------------------------------------------------------------
+-- Parameter helpers
+--------------------------------------------------------------------------------
 local function expandParameters(arguments)
-	local expanded = {}
-	for _, argument in ipairs(arguments) do
-		-- Check if parameter name is varargs, don't expand it
-		if argument.name == "..." then
-			-- Add varargs as is
-			table.insert(expanded, argument)
-		-- Check if parameter name contains commas (multiple parameters)
-		elseif string.find(argument.name, ",") then
-			-- Split by comma and create separate entries
-			for name in string.gmatch(argument.name, "%s*([^,]+)%s*") do
-				table.insert(expanded, {
-					type = argument.type,
-					name = name,
-					description = argument.description,
-					default = argument.default,
-					table = argument.table,
-				})
-			end
-		else
-			-- Single parameter, add as is
-			table.insert(expanded, argument)
-		end
-	end
-	return expanded
+    if not arguments then
+        return {}
+    end
+    local expanded = {}
+    for _, argument in ipairs(arguments) do
+        if argument.name == "..." then
+            expanded[#expanded + 1] = argument
+        elseif string.find(argument.name, ",") then
+            for name in string.gmatch(argument.name, "%s*([^,]+)%s*") do
+                expanded[#expanded + 1] = {
+                    type        = argument.type,
+                    name        = name,
+                    description = argument.description,
+                    default     = argument.default,
+                    table       = argument.table,
+                    callback    = argument.callback,
+                }
+            end
+        else
+            expanded[#expanded + 1] = argument
+        end
+    end
+    return expanded
 end
 
--- Generate inline table type {field:type, field:type, ...}
-local function genInlineTableType(fields)
-	if not fields or #fields == 0 then
-		return "{}"
-	end
-
-	local s = "{"
-	for i, field in ipairs(fields) do
-		local fieldType = addNamespaceToType(field.type)
-		local decl = field.name .. ":" .. fieldType
-		if i == 1 then
-			s = s .. decl
-		else
-			s = s .. ", " .. decl
-		end
-	end
-	s = s .. "}"
-	return s
-end
-
--- Check if argument name is varargs (...)
 local function isVarargs(name)
-	return name == "..."
+    return name == "..."
+end
+
+local function buildCallbackType(cb)
+    if not cb then
+        return "fun(...)"
+    end
+
+    local parts = {}
+    for _, a in ipairs(cb.arguments or {}) do
+        local t = proc(a.type)
+        parts[#parts + 1] = a.name and (convertStringToParam(a.name) .. ": " .. t) or t
+    end
+
+    local sig = "fun(" .. table.concat(parts, ", ") .. ")"
+
+    local rets = {}
+    for _, r in ipairs(cb.returns or {}) do
+        rets[#rets + 1] = proc(r.type)
+    end
+    if #rets > 0 then
+        sig = sig .. ": " .. table.concat(rets, ", ")
+    end
+
+    return sig
+end
+
+--------------------------------------------------------------------------------
+-- Generation: functions, types, enums, modules
+-- inline types; reuse return.table for param when arg.table absent; generate
+-- classes for returns with field descriptions
+--------------------------------------------------------------------------------
+local function genClassName(moduleName, functionName, paramName)
+    return moduleName .. "." .. functionName .. "." .. paramName
+end
+
+local function fieldsRequireClass(fields)
+    for _, f in ipairs(fields) do
+        if f.description and tostring(f.description) ~= "" then
+            return true
+        end
+    end
+    return false
+end
+
+local function appendDefaultDesc(desc, default)
+    if default == nil then
+        return desc or ""
+    end
+    desc = desc or ""
+    local dstr = tostring(default)
+
+    -- treat string "true"/"false" as boolean-like default to
+    return desc .. (desc == "" and "" or " ") .. "(defaults to `" .. dstr .. "`.)"
+end
+
+-- genClassForTable now accepts `static` and uses that separator when building class names/descriptions
+local function genClassForTable(module, func, param, fields, desc, static)
+    if not fieldsRequireClass(fields) then
+        return nil, nil
+    end
+
+    local rootParam = param
+    local rootClassName = module .. delimiter(static) .. func .. "." .. rootParam
+
+    local queue = { { paramPath = param, fields = fields, desc = desc or "", depth = 0 } }
+    local idx = 1
+    local nodes_by_depth = {} -- nodes_by_depth[depth] = { node, ... }
+    local maxDepth = 0
+
+    while idx <= #queue do
+        local node = queue[idx]
+        idx = idx + 1
+
+        if not node or type(node) ~= "table" then
+        else
+            local d = node.depth or 0
+            nodes_by_depth[d] = nodes_by_depth[d] or {}
+            table.insert(nodes_by_depth[d], node)
+            if d > maxDepth then maxDepth = d end
+
+            local nodeFields = node.fields
+            if nodeFields and type(nodeFields) == "table" then
+                for _, f in ipairs(nodeFields) do
+                    if f and f.name ~= "..." and f.table and type(f.table) == "table" and #f.table > 0 then
+                        local childParamPath = node.paramPath .. "." .. f.name
+                        table.insert(queue, {
+                            paramPath = childParamPath,
+                            fields    = f.table,
+                            desc      = f.description or "",
+                            depth     = d + 1,
+                        })
+                    end
+                end
+            end
+        end
+    end
+
+    local function genSingleClass(node)
+        local className = module .. delimiter(true) .. func .. "." .. node.paramPath
+        local lines = {}
+        if node.desc and node.desc ~= "" then
+            lines[#lines + 1] = ("---Options for `%s%s`."):format(module .. delimiter(static) .. func, "")
+        end
+        lines[#lines + 1] = ("---@class " .. className)
+
+        -- find first non-vararg field index (positional "first" field)
+        local firstNonVarFieldIdx = nil
+        for idxF, f in ipairs(node.fields) do
+            if f.name ~= "..." then
+                firstNonVarFieldIdx = idxF
+                break
+            end
+        end
+
+        for i, f in ipairs(node.fields) do
+            if f.name ~= "..." then
+                local isOptional = (f.default ~= nil)
+                if firstNonVarFieldIdx ~= nil and i == firstNonVarFieldIdx then
+                    isOptional = false
+                end
+
+                local ftype = f.type or "any"
+                if string.find(ftype, " or ") or string.find(ftype, " and ") then
+                    ftype = processTypeString(ftype, knownTypes)
+                end
+
+                -- description (first sentence) for the field itself + default if present
+                local fldDesc = ""
+                if f.description and f.description ~= "" then
+                    fldDesc = first_sentence(f.description)
+                end
+
+                fldDesc = (f.default ~= nil) and appendDefaultDesc(fldDesc, f.default) or fldDesc
+                fldDesc = trim(fldDesc)
+                fldDesc = (fldDesc ~= "" and " " .. fldDesc) or ""
+
+                if f.table and #f.table > 0 then
+                    ftype = module .. delimiter(static) .. func .. "." .. node.paramPath .. "." .. f.name
+                else
+                    ftype = addNamespaceToType(ftype)
+                end
+                lines[#lines + 1] = ("---@field %s%s %s%s"):format(f.name, isOptional and "?" or "", ftype, fldDesc)
+            end
+        end
+
+        return className, table.concat(lines, "\n") .. "\n\n"
+    end
+
+    local all_codes = {}
+    for depth = 0, maxDepth do
+        local nodes = nodes_by_depth[depth]
+        if type(nodes) == "table" then
+            for _, node in ipairs(nodes) do
+                if type(node) == "table" then
+                    local _, code = genSingleClass(node)
+                    if type(code) == "string" and code ~= "" then
+                        all_codes[#all_codes + 1] = code
+                    end
+                end
+            end
+        end
+    end
+
+    local classCode = table.concat(all_codes, "")
+    return rootClassName, classCode
+end
+
+--------------------------------------------------------------------------------
+-- Returns helpers: build inline type AND optionally className+classCode if fieldsRequireClass
+--------------------------------------------------------------------------------
+local function getReturnType(ret, moduleName, functionName, returnIndex, static)
+    if not ret then
+        return "any", nil, nil
+    end
+
+    local function buildInlineFromFields(fields)
+        local parts = {}
+        for _, f in ipairs(fields or {}) do
+            if f.name ~= "..." then
+                local ftype
+                if f.table and #f.table > 0 then
+                    local nested = {}
+                    for _, nf in ipairs(f.table) do
+                        if nf.name ~= "..." then
+                            local nt = proc(nf.type)
+                            nested[#nested + 1] = keyConvert(nf.name) .. ": " .. nt
+                        end
+                    end
+                    ftype = "{ " .. table.concat(nested, ", ") .. " }"
+                else
+                    ftype = proc(f.type)
+                end
+                parts[#parts + 1] = keyConvert(f.name) .. ": " .. ftype
+            end
+        end
+        return "{ " .. table.concat(parts, ", ") .. " }"
+    end
+
+    if ret.arraytype and (not ret.table or #ret.table == 0) then
+        return proc(ret.arraytype) .. "[]", nil, nil
+    end
+
+    if ret.table and #ret.table > 0 then
+        local inlineType = buildInlineFromFields(ret.table)
+        if ret.type then
+            local plural = select(1, isPlural(ret.type, knownTypes))
+            if plural then
+                inlineType = inlineType .. "[]"
+            end
+        end
+
+        if fieldsRequireClass(ret.table) then
+            local paramName = (returnIndex and returnIndex > 1) and ("result" .. returnIndex) or "result"
+            local className, classCode =
+                genClassForTable(moduleName, functionName, paramName, ret.table, ret.description, static)
+            return inlineType, className, classCode
+        end
+
+        return inlineType, nil, nil
+    end
+
+    if not ret.type then
+        return "any", nil, nil
+    end
+
+    return proc(ret.type), nil, nil
+end
+
+local function genReturns(variant, moduleName, functionName, static)
+    local rets = variant.returns or {}
+    if #rets == 0 then
+        return {}, {}
+    end
+    local types = {}
+    local classes = {}
+    for i, r in ipairs(rets) do
+        local t, cname, ccode = getReturnType(r, moduleName, functionName, i, static)
+        types[#types + 1] = t or "any"
+        if ccode and ccode ~= "" and cname and cname ~= "" then
+            classes[#classes + 1] = { name = cname, code = ccode }
+        end
+    end
+    return types, classes
+end
+
+local function reuseReturnForArg(variant, arg, moduleName, funName)
+    local returnsList = variant.returns or {}
+
+    local exact, exactIdx
+    local firstTable, firstTableIdx
+    local firstArray, firstArrayIdx
+
+    for i, r in ipairs(returnsList) do
+        if r.table and #r.table > 0 and r.name == arg.name then
+            exact, exactIdx = r, i
+            break
+        end
+        if r.table and #r.table > 0 and not firstTable then
+            firstTable, firstTableIdx = r, i
+        end
+        if r.arraytype and not firstArray then
+            firstArray, firstArrayIdx = r, i
+        end
+    end
+
+    local candidate = exact or firstTable or firstArray
+    local candIdx = exactIdx or firstTableIdx or firstArrayIdx
+    if not candidate then
+        return nil, nil, nil
+    end
+
+    local paramFields, paramArrayType, paramClassName
+
+    if candidate.table and #candidate.table > 0 then
+        paramFields = candidate.table
+        if fieldsRequireClass(paramFields) then
+            local name = (#returnsList > 1 and candIdx and candIdx > 1) and ("result" .. candIdx) or "result"
+            paramClassName = genClassName(moduleName, funName, name)
+        end
+    else
+        paramArrayType = candidate.arraytype
+    end
+
+    return paramFields, paramArrayType, paramClassName
+end
+
+local function buildInlineFromFields(fields)
+    local parts = {}
+    for _, f in ipairs(fields) do
+        if f.name == "..." then
+            -- skip vararg-like field
+        else
+            local ftype = f.type or "any"
+            if ftype:find(" or ") or ftype:find(" and ") then
+                ftype = processTypeString(ftype, knownTypes)
+            end
+
+            if f.table and #f.table > 0 then
+                local nestedParts = {}
+                for _, nf in ipairs(f.table) do
+                    if nf.name ~= "..." then
+                        local nftype = nf.type
+                        if nftype and (nftype:find(" or ") or nftype:find(" and ")) then
+                            nftype = processTypeString(nftype, knownTypes)
+                        end
+                        nftype = proc(nftype)
+                        nestedParts[#nestedParts + 1] = keyConvert(nf.name) .. ": " .. nftype
+                    end
+                end
+                ftype = "{ " .. table.concat(nestedParts, ", ") .. " }"
+            else
+                ftype = proc(ftype)
+            end
+
+            parts[#parts + 1] = keyConvert(f.name) .. ": " .. ftype
+        end
+    end
+    return "{ " .. table.concat(parts, ", ") .. " }"
 end
 
 local function genFunction(moduleName, fun, static)
-	local code = safeDesc(fun.description) .. "\n"
-	code = code .. "---\n"
-	code = code .. "---[Open in Browser](https://love2d.org/wiki/" .. moduleName .. "." .. fun.name .. ")\n"
-	code = code .. "---\n"
+    local code = ""
+    local funcDesc = fun.description or ""
+    if fun.throws then
+        funcDesc = funcDesc .. (funcDesc ~= "" and " " or "") .. "(May throw an error.)"
+    end
 
-	local argList = ""
+    local classes = {}
+    local classNames = {}
 
-	local ordered = {}
+    local ordered = {}
+    for _, variant in ipairs(fun.variants or {}) do
+        ordered[#ordered + 1] = variant
+    end
+    table.sort(ordered, function(a, b)
+        local aArgCount = #(a.arguments or {})
+        local bArgCount = #(b.arguments or {})
+        if aArgCount ~= bArgCount then
+            return aArgCount > bArgCount
+        end
+        return #(a.returns or {}) > #(b.returns or {})
+    end)
 
-	for _, variant in ipairs(fun.variants) do
-		table.insert(ordered, variant)
-	end
+    local mainVariant = nil
+    mainVariant = ordered[1] or mainVariant
+    if mainVariant and mainVariant.returns and #mainVariant.returns > 0 then
+        local _, returnedClasses = genReturns(mainVariant, moduleName, fun.name, static)
+        for _, cls in ipairs(returnedClasses or {}) do
+            if cls and cls.name and cls.code and not classNames[cls.name] then
+                classNames[cls.name] = true
+                classes[#classes + 1] = cls.code
+            end
+        end
+    end
 
-	-- Sort variants by number of arguments (descending), then by return count
-	table.sort(ordered, function(a, b)
-		local aArgCount = #(a.arguments or {})
-		local bArgCount = #(b.arguments or {})
-		if aArgCount ~= bArgCount then
-			return aArgCount > bArgCount
-		end
-		-- If same arg count, sort by return count
-		return #(a.returns or {}) > #(b.returns or {})
-	end)
+    -- Generate classes for table-typed arguments that have field descriptions.
+    -- This makes genClassForTable produce classes for parameter tables (e.g. flags/options)
+    -- when at least one field has a description (fieldsRequireClass).
+    do
+        local arguments = expandParameters((mainVariant and mainVariant.arguments) or {})
+        for _, arg in ipairs(arguments) do
+            if not isVarargs(arg.name) and arg.type == "table" then
+                local paramFields = arg.table
+                if not paramFields or #paramFields == 0 then
+                    paramFields = reuseReturnForArg(mainVariant, arg, moduleName, fun.name)
+                end
 
-	for vIdx, variant in ipairs(ordered) do
-		-- args
-		local arguments = variant.arguments or {}
-		-- Expand combined parameter names into separate entries
-		arguments = expandParameters(arguments)
+                if paramFields and #paramFields > 0 and fieldsRequireClass(paramFields) then
+                    local pname, pcode =
+                        genClassForTable(moduleName, fun.name, arg.name, paramFields, arg.description, static)
+                    if pcode and pname and pname ~= "" and not classNames[pname] then
+                        classNames[pname] = true
+                        classes[#classes + 1] = pcode
+                    end
+                end
+            end
+        end
+    end
 
-		if vIdx == 1 then
-			-- First variant - document as main signature
-			for argIdx, argument in ipairs(arguments) do
-				if argIdx == 1 then
-					argList = argument.name
-				else
-					argList = argList .. ", " .. argument.name
-				end
+    for _, classCode in ipairs(classes) do
+        code = code .. classCode
+    end
 
-				local type = argument.type
-				local description = argument.description
-				local isOptional = false
+    code = code .. (funcDesc ~= "" and safeDesc(funcDesc) or "") .. "\n"
+    code = code .. "---\n"
+    code = code ..
+        ("---[" .. wikiLinkName .. "](" .. wikiLinkUrl .. moduleName .. delimiter(static) .. fun.name .. ")\n")
+    code = code .. "---\n"
 
-				if argument.default then
-					isOptional = true
-					description = description .. " (Defaults to " .. argument.default .. ".)"
-				end
+    local argList = ""
 
-				-- If parameter has table fields, use inline table type
-				if argument.table and #argument.table > 0 then
-					type = genInlineTableType(argument.table)
-				end
+    for vIdx, variant in ipairs(ordered) do
+        local arguments = expandParameters(variant.arguments or {})
 
-				-- Check if it's a descriptive type first
-				if descriptiveTypes[type] then
-					-- It's a descriptive type - use as is
-					if isOptional then
-						type = type .. "?"
-					end
-				else
-					-- Process the type string
-					local processedType = processTypeString(type)
+        -- find first non-vararg index for this variant (positional "first" argument)
+        local firstNonVarargIdx = nil
+        for idx, a in ipairs(arguments) do
+            if not isVarargs(a.name) then
+                firstNonVarargIdx = idx
+                break
+            end
+        end
 
-					-- Extract first type if there are alternatives
-					local baseType = string.match(processedType, "^([^%s|]+)")
-					if baseType and not string.find(baseType, "{") then
-						local typeToAdd = addNamespaceToType(baseType)
-						if isOptional then
-							typeToAdd = typeToAdd .. "?"
-						end
-						type = typeToAdd
-					else
-						local typeToAdd = addNamespaceToType(processedType)
-						if isOptional then
-							typeToAdd = typeToAdd .. "?"
-						end
-						type = typeToAdd
-					end
-				end
+        if not isEmpty(variant.description) then
+            code = code .. safeDesc(variant.description) .. "\n"
+        end
+        if vIdx == 1 then
+            code = code .. (not static and ("---@param self %s\n"):format(apiName .. "." .. moduleName) or "")
 
-				-- Handle varargs differently
-				if isVarargs(argument.name) then
-					code = code .. "---@vararg " .. type .. " # " .. description .. "\n"
-				else
-					code = code .. "---@param " .. argument.name .. " " .. type .. " # " .. description .. "\n"
-				end
-			end
+            for argIdx, arg in ipairs(arguments) do
+                argList = (argIdx == 1) and arg.name or (argList .. ", " .. arg.name)
+                -- keep '...' in signature only
+                if not isVarargs(arg.name) then
+                    local atype = arg.type or "any"
+                    local desc = trimParam(arg.description)
 
-			-- Add return type for main signature (only if there are returns)
-			local returns = variant.returns
-			if returns and #returns > 0 then
-				code = code .. "---@return " .. genReturns(variant) .. "\n"
-			end
-		else
-			-- Check if variant has description different from main
-			local hasDescription = variant.description and variant.description ~= fun.description
+                    local isOptional
+                    if firstNonVarargIdx ~= nil then
+                        isOptional = (argIdx ~= firstNonVarargIdx) and (arg.default ~= nil)
+                    else
+                        isOptional = (argIdx ~= 1) and (arg.default ~= nil)
+                    end
 
-			if hasDescription then
-				-- Add separator and description before overload
-				code = code .. "---\n"
-				code = code .. safeDesc(variant.description) .. "\n"
-			end
+                    if atype == "Variant" then
+                        isOptional = false
+                    end
 
-			-- Other variants - document as overloads
-			code = code .. "---@overload fun("
+                    -- Build param inline type:
+                    local paramClassName
 
-			-- Add self parameter for methods
-			if not static then
-				code = code .. "self:" .. moduleName
-				if #arguments > 0 then
-					code = code .. ", "
-				end
-			end
+                    desc = appendDefaultDesc(desc, arg.default)
+                    atype = proc(atype)
 
-			local firstParam = true
-			for _, argument in ipairs(arguments) do
-				-- Skip varargs in overload
-				if not isVarargs(argument.name) then
-					local type = argument.type
-					local isOptional = false
+                    if atype == "table" then
+                        local paramFields = arg.table
+                        local paramArrayType
 
-					if argument.default then
-						isOptional = true
-					end
+                        if not paramFields or #paramFields == 0 then
+                            paramFields, paramArrayType, paramClassName =
+                                reuseReturnForArg(variant, arg, moduleName, fun.name)
+                        end
 
-					-- If parameter has table fields, use inline table type
-					if argument.table and #argument.table > 0 then
-						type = genInlineTableType(argument.table)
-					end
+                        if paramArrayType ~= nil and (not paramFields or #paramFields == 0) then
+                            atype = proc(paramArrayType) .. "[]"
+                        elseif paramFields and #paramFields > 0 then
+                            atype = buildInlineFromFields(paramFields)
+                        else
+                            atype = "table"
+                        end
 
-					-- Check if it's a descriptive type first
-					if descriptiveTypes[type] then
-						-- It's a descriptive type - use as is
-						if isOptional then
-							type = type .. "?"
-						end
-					else
-						-- Process the type string
-						local processedType = processTypeString(type)
+                        desc = appendDefaultDesc(desc, arg.default)
 
-						-- Extract first type if there are alternatives
-						local baseType = string.match(processedType, "^([^%s|]+)")
-						if baseType and not string.find(baseType, "{") then
-							type = addNamespaceToType(baseType)
-						else
-							type = addNamespaceToType(processedType)
-						end
-					end
+                        if paramClassName ~= nil then
+                            local link = ("See class " .. paramClassName .. " for field descriptions.")
+                            desc = desc .. (desc ~= "" and " " or "") .. link
+                        end
+                    elseif atype == "function" then
+                        atype = buildCallbackType(arg.callback)
+                    end
 
-					if not firstParam then
-						code = code .. ", "
-					end
+                    atype = atype .. (isOptional and "?" or "")
 
-					code = code .. argument.name .. ":" .. type
-					if isOptional then
-						code = code .. "?"
-					end
+                    desc = desc ~= "" and " " .. desc or ""
+                    code = code .. ("---@param " .. arg.name .. " " .. atype .. desc .. "\n")
+                end
+            end
 
-					firstParam = false
-				end
-			end
+            -- Returns for main variant
+            if variant.returns and #variant.returns > 0 then
+                for ri, r in ipairs(variant.returns) do
+                    local rType, rClassName = getReturnType(r, moduleName, fun.name, ri, static)
+                    local rDesc, rName = "", ""
+                    if r.description and tostring(r.description) ~= "" then
+                        rDesc = " " .. first_sentence(r.description)
+                    end
 
-			code = code .. ")"
+                    if r.name and tostring(r.name) ~= "" and r.name ~= "..." then
+                        rName = " " .. r.name
+                    end
 
-			-- Add return type for overloads
-			local returns = variant.returns
-			if returns and #returns > 0 then
-				local returnType = genReturns(variant)
-				code = code .. ":" .. returnType
-			else
-				code = code .. ":nil"
-			end
-			code = code .. "\n"
-		end
-	end
+                    -- when has no description but has a name = '...'
+                    if rDesc == "" and r.name == "..." then
+                        rName = " " .. r.name
+                    end
+                    -- If there is a class for this return, append reference in comment
+                    if rClassName then
+                        rDesc = rDesc .. " See class " .. rClassName .. " for field descriptions."
+                    end
+                    code = code .. ("---@return " .. (rType or "any") .. rName  .. rDesc .. "\n")
+                end
+            end
+        else
+            code = code .. "---@overload fun("
+            if not static then
+                code = code .. "self: " .. apiName .. "." .. moduleName .. ((#arguments > 0) and ", " or "")
+            end
 
-	local dot = static and "." or ":"
-	code = code .. "function " .. moduleName .. dot .. fun.name .. "(" .. argList .. ") end\n\n"
-	return code
+            local firstParam = true
+            for argIdx, argument in ipairs(arguments) do
+                if not isVarargs(argument.name) then
+                    local atype = argument.type or "any"
+                    if argument.table and #argument.table > 0 then
+                        local inlineParts = {}
+                        for _, f in ipairs(argument.table) do
+                            if f.name ~= "..." then
+                                local ftype = f.type or "any"
+                                if string.find(ftype, " or ") or string.find(ftype, " and ") then
+                                    ftype = processTypeString(ftype, knownTypes)
+                                end
+                                if f.table and #f.table > 0 then
+                                    -- nested inline
+                                    local nestedParts = {}
+                                    for _, nf in ipairs(f.table) do
+                                        if nf.name ~= "..." then
+                                            local nftype = nf.type
+                                            if
+                                                string.find(nftype or "", " or ") or string.find(nftype or "", " and ")
+                                            then
+                                                nftype = processTypeString(nftype, knownTypes)
+                                            end
+                                            nftype = proc(nftype)
+                                            nestedParts[#nestedParts + 1] = keyConvert(nf.name) .. ": " .. nftype
+                                        end
+                                    end
+                                    ftype = "{ " .. table.concat(nestedParts, ", ") .. " }"
+                                else
+                                    ftype = proc(ftype)
+                                end
+                                inlineParts[#inlineParts + 1] = keyConvert(f.name) .. ": " .. ftype
+                            end
+                        end
+                        atype = "{ " .. table.concat(inlineParts, ", ") .. " }"
+                    else
+                        atype = proc(atype)
+                    end
+
+                    code = code .. (not firstParam and ", " or "")
+                    if convertStringToParam(argument.name) == argument.name then
+                        code = code .. argument.name .. ": " .. atype
+                    else
+                        code = code .. convertStringToParam(argument.name) .. ": " .. atype .. "|" .. argument.name
+                    end
+                    -- Determine optional mark based on firstNonVarargIdx for this variant
+                    local optionalMark = ""
+                    if firstNonVarargIdx ~= nil then
+                        if argument.default and (argIdx ~= firstNonVarargIdx) then
+                            optionalMark = "?"
+                        end
+                    else
+                        if argument.default and (argIdx ~= 1) then
+                            optionalMark = "?"
+                        end
+                    end
+
+                    code = code .. optionalMark
+                    firstParam = false
+                end
+            end
+
+            code = code .. ")"
+            if variant.returns and #variant.returns > 0 then
+                local rets = {}
+                for i, ret in ipairs(variant.returns) do
+                    local t, _, _ = getReturnType(ret, moduleName, fun.name, i, static)
+                    rets[#rets + 1] = t
+                end
+                code = code .. ": " .. table.concat(rets, ", ")
+            else
+                code = code .. ": nil"
+            end
+            code = code .. "\n"
+        end
+    end
+
+    code = code .. ("function " .. moduleName .. delimiter(static) .. fun.name .. "(" .. argList .. ") end\n\n")
+    return code
 end
 
-local function genType(name, type)
-	local code = safeDesc(type.description) .. "\n"
-	code = code .. "---\n"
-	code = code .. "---[Open in Browser](https://love2d.org/wiki/" .. type.name .. ")\n"
-	code = code .. "---\n"
-	code = code .. "---@class " .. type.name
-	if type.supertypes then
-		code = code .. " : " .. table.concat(type.supertypes, ", ")
-	end
-	code = code .. "\nlocal " .. name .. " = {}\n"
-	-- functions
-	if type.functions then
-		for _, fun in ipairs(type.functions) do
-			code = code .. genFunction(name, fun, false)
-		end
-	end
-
-	return code
+local function genType(type)
+    local code = ""
+    if type.description then
+        code = code .. safeDesc(type.description) .. "\n"
+    end
+    code = code .. "---\n"
+    code = code .. ("---[" .. wikiLinkName .. "](" .. wikiLinkUrl .. type.name .. ")\n")
+    code = code .. "---\n"
+    code = code .. "---@class " .. apiName .. "." .. type.name
+    if type.supertypes then
+        code = code .. " : " .. apiName .. "." .. table.concat(type.supertypes, ", " .. apiName .. ".")
+    end
+    code = code .. "\nlocal " .. type.name .. " = {}\n\n"
+    if type.functions then
+        for _, fun in ipairs(type.functions) do
+            code = code .. genFunction(type.name, fun, false)
+        end
+    end
+    return code
 end
 
 local function genEnum(enum)
-	local code = safeDesc(enum.description) .. "\n"
-	code = code .. "---\n"
-	code = code .. "---[Open in Browser](https://love2d.org/wiki/" .. enum.name .. ")\n"
-	code = code .. "---\n"
-	code = code .. "---@alias " .. enum.name .. "\n"
-	for _, const in ipairs(enum.constants) do
-		code = code .. '---| "' .. const.name .. '" -- ' .. stripNewlines(const.description) .. "\n"
-	end
-	code = code .. "\n"
-	return code
-end
-
--- Create directory recursively if it doesn't exist
-local function createDirectory(path)
-	local current = ""
-	for part in string.gmatch(path, "[^/\\]+") do
-		current = current .. part
-		-- Try to create directory (ignore error if it exists)
-		os.execute("mkdir " .. current .. " 2>nul || true")
-		current = current .. "/"
-	end
+    local code = ""
+    if enum.description then
+        code = code .. safeDesc(enum.description) .. "\n"
+    end
+    code = code .. "---\n"
+    code = code .. ("---[" .. wikiLinkName .. "](" .. wikiLinkUrl .. enum.name .. ")\n")
+    code = code .. "---\n"
+    code = code .. "---@alias " .. apiName .. "." .. enum.name .. "\n"
+    for _, const in ipairs(enum.constants) do
+        code = code .. '---| "' .. const.name .. '" # ' .. stripNewlines(const.description) .. "\n"
+    end
+    code = code .. "\n"
+    return code
 end
 
 local function genModule(name, api, outDir)
-	print("Generating module " .. name)
-	local f = assert(io.open(outDir .. "/" .. name .. ".lua", "w"))
-	f:write("---@meta\n")
-	f:write("---@namespace love\n\n")
+    print("Generating module " .. name)
+    local f = assert(io.open(outDir .. "/" .. name .. "." .. fileExt, "w"))
+    f:write("---@meta " .. apiEngine .. "\n\n")
 
-	if api.description then
-		f:write(safeDesc(api.description) .. "\n")
-	end
+    if name == apiName and api and api.version and tostring(api.version) ~= "" then
+        f:write("-- version: " .. tostring(api.version) .. "\n")
+    end
 
-	f:write(name .. " = {}\n\n")
+    if api.description then
+        f:write(safeDesc(api.description) .. "\n")
+    end
 
-	-- types
-	if api.types then
-		for _, type in ipairs(api.types) do
-			f:write("--region " .. type.name .. "\n\n")
-			f:write(genType(type.name, type))
-			f:write("--endregion " .. type.name .. "\n\n")
-		end
-	end
+    f:write("---\n")
+    f:write("---[" .. (wikiLinkName or "Open in Browser") .. "](" .. wikiLinkUrl .. name .. ")\n")
+    f:write("---\n")
 
-	-- enums
-	if api.enums then
-		for _, enum in ipairs(api.enums) do
-			f:write(genEnum(enum))
-		end
-	end
+    f:write("---@class " .. name .. "\n")
+    f:write(name .. " = {}\n\n")
 
-	-- modules
-	if api.modules then
-		for _, m in ipairs(api.modules) do
-			genModule(name .. "." .. m.name, m, outDir)
-		end
-	end
+    if api.types then
+        for _, t in ipairs(api.types) do
+            f:write("--region " .. apiName .. "." .. t.name .. "\n\n")
+            f:write(genType(t))
+            f:write("--endregion " .. apiName .. "." .. t.name .. "\n\n")
+        end
+    end
 
-	-- functions
-	for _, fun in ipairs(api.functions) do
-		f:write(genFunction(name, fun, true))
-	end
+    if api.enums then
+        for _, e in ipairs(api.enums) do
+            f:write(genEnum(e))
+        end
+    end
 
-	-- Add newline at the end of the file
-	f:close()
+    if api.modules then
+        for _, m in ipairs(api.modules) do
+            genModule(name .. "." .. m.name, m, outDir)
+        end
+    end
+
+    if api.functions then
+        for _, fn in ipairs(api.functions) do
+            f:write(genFunction(name, fn, true))
+        end
+    end
+
+    if api.callbacks then
+        for _, fn in ipairs(api.callbacks) do
+            f:write(genFunction(name, fn, true))
+        end
+    end
+
+    if name == apiName and api then
+        -- add alias only to toplevel namespaces
+        f:write(aliasTypeToDef(aliasType))
+    end
+
+    f:close()
 end
 
--- Create directory before generating
-createDirectory(outputDir)
-
-genModule("love", api, outputDir)
+genModule(apiName, apiRequire, outputDir)
 
 local completed = os.clock() - time
 print("--------")

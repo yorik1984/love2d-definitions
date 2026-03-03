@@ -1,10 +1,13 @@
----@meta
----@namespace love
+---@meta love2d
 
 ---Provides system-independent mathematical functions.
+---
+---[Open in Browser](https://love2d.org/wiki/love.math)
+---
+---@class love.math
 love.math = {}
 
---region BezierCurve
+--region love.BezierCurve
 
 ---A Bézier curve object that can evaluate and render Bézier curves of arbitrary degree.
 ---
@@ -12,72 +15,83 @@ love.math = {}
 ---
 ---[Open in Browser](https://love2d.org/wiki/BezierCurve)
 ---
----@class BezierCurve : Object
+---@class love.BezierCurve : love.Object
 local BezierCurve = {}
+
 ---Evaluate Bézier curve at parameter t. The parameter must be between 0 and 1 (inclusive).
 ---
 ---This function can be used to move objects along paths or tween parameters. However it should not be used to render the curve, see BezierCurve:render for that purpose.
 ---
----[Open in Browser](https://love2d.org/wiki/BezierCurve.evaluate)
+---[Open in Browser](https://love2d.org/wiki/BezierCurve:evaluate)
 ---
----@param t number # Where to evaluate the curve.
----@return number, number
+---@param self love.BezierCurve
+---@param t number Where to evaluate the curve.
+---@return number x x coordinate of the curve at parameter t.
+---@return number y y coordinate of the curve at parameter t.
 function BezierCurve:evaluate(t) end
 
 ---Get coordinates of the i-th control point. Indices start with 1.
 ---
----[Open in Browser](https://love2d.org/wiki/BezierCurve.getControlPoint)
+---[Open in Browser](https://love2d.org/wiki/BezierCurve:getControlPoint)
 ---
----@param i number # Index of the control point.
----@return number, number
+---@param self love.BezierCurve
+---@param i number Index of the control point.
+---@return number x Position of the control point along the x axis.
+---@return number y Position of the control point along the y axis.
 function BezierCurve:getControlPoint(i) end
 
 ---Get the number of control points in the Bézier curve.
 ---
----[Open in Browser](https://love2d.org/wiki/BezierCurve.getControlPointCount)
+---[Open in Browser](https://love2d.org/wiki/BezierCurve:getControlPointCount)
 ---
----@return number
+---@param self love.BezierCurve
+---@return number count The number of control points.
 function BezierCurve:getControlPointCount() end
 
 ---Get degree of the Bézier curve. The degree is equal to number-of-control-points - 1.
 ---
----[Open in Browser](https://love2d.org/wiki/BezierCurve.getDegree)
+---[Open in Browser](https://love2d.org/wiki/BezierCurve:getDegree)
 ---
----@return number
+---@param self love.BezierCurve
+---@return number degree Degree of the Bézier curve.
 function BezierCurve:getDegree() end
 
 ---Get the derivative of the Bézier curve.
 ---
 ---This function can be used to rotate sprites moving along a curve in the direction of the movement and compute the direction perpendicular to the curve at some parameter t.
 ---
----[Open in Browser](https://love2d.org/wiki/BezierCurve.getDerivative)
+---[Open in Browser](https://love2d.org/wiki/BezierCurve:getDerivative)
 ---
----@return love.BezierCurve
+---@param self love.BezierCurve
+---@return love.BezierCurve derivative The derivative curve.
 function BezierCurve:getDerivative() end
 
 ---Gets a BezierCurve that corresponds to the specified segment of this BezierCurve.
 ---
----[Open in Browser](https://love2d.org/wiki/BezierCurve.getSegment)
+---[Open in Browser](https://love2d.org/wiki/BezierCurve:getSegment)
 ---
----@param startpoint number # The starting point along the curve. Must be between 0 and 1.
----@param endpoint number # The end of the segment. Must be between 0 and 1.
----@return love.BezierCurve
+---@param self love.BezierCurve
+---@param startpoint number The starting point along the curve. Must be between 0 and 1.
+---@param endpoint number The end of the segment. Must be between 0 and 1.
+---@return love.BezierCurve curve A BezierCurve that corresponds to the specified segment.
 function BezierCurve:getSegment(startpoint, endpoint) end
 
 ---Insert control point as the new i-th control point. Existing control points from i onwards are pushed back by 1. Indices start with 1. Negative indices wrap around: -1 is the last control point, -2 the one before the last, etc.
 ---
----[Open in Browser](https://love2d.org/wiki/BezierCurve.insertControlPoint)
+---[Open in Browser](https://love2d.org/wiki/BezierCurve:insertControlPoint)
 ---
----@param x number # Position of the control point along the x axis.
----@param y number # Position of the control point along the y axis.
----@param i number? # Index of the control point. (Defaults to -1.)
+---@param self love.BezierCurve
+---@param x number Position of the control point along the x axis.
+---@param y number Position of the control point along the y axis.
+---@param i number? Index of the control point. (defaults to `-1`.)
 function BezierCurve:insertControlPoint(x, y, i) end
 
 ---Removes the specified control point.
 ---
----[Open in Browser](https://love2d.org/wiki/BezierCurve.removeControlPoint)
+---[Open in Browser](https://love2d.org/wiki/BezierCurve:removeControlPoint)
 ---
----@param index number # The index of the control point to remove.
+---@param self love.BezierCurve
+---@param index number The index of the control point to remove.
 function BezierCurve:removeControlPoint(index) end
 
 ---Get a list of coordinates to be used with love.graphics.line.
@@ -86,10 +100,11 @@ function BezierCurve:removeControlPoint(index) end
 ---
 ---If you are just interested to know the position on the curve given a parameter, use BezierCurve:evaluate.
 ---
----[Open in Browser](https://love2d.org/wiki/BezierCurve.render)
+---[Open in Browser](https://love2d.org/wiki/BezierCurve:render)
 ---
----@param depth number? # Number of recursive subdivision steps. (Defaults to 5.)
----@return table
+---@param self love.BezierCurve
+---@param depth number Number of recursive subdivision steps. (defaults to `5`.)
+---@return number[] coordinates List of x,y-coordinate pairs of points on the curve.
 function BezierCurve:render(depth) end
 
 ---Get a list of coordinates on a specific part of the curve, to be used with love.graphics.line.
@@ -98,124 +113,138 @@ function BezierCurve:render(depth) end
 ---
 ---If you are just need to know the position on the curve given a parameter, use BezierCurve:evaluate.
 ---
----[Open in Browser](https://love2d.org/wiki/BezierCurve.renderSegment)
+---[Open in Browser](https://love2d.org/wiki/BezierCurve:renderSegment)
 ---
----@param startpoint number # The starting point along the curve. Must be between 0 and 1.
----@param endpoint number # The end of the segment to render. Must be between 0 and 1.
----@param depth number? # Number of recursive subdivision steps. (Defaults to 5.)
----@return table
+---@param self love.BezierCurve
+---@param startpoint number The starting point along the curve. Must be between 0 and 1.
+---@param endpoint number The end of the segment to render. Must be between 0 and 1.
+---@param depth number? Number of recursive subdivision steps. (defaults to `5`.)
+---@return number[] coordinates List of x,y-coordinate pairs of points on the specified part of the curve.
 function BezierCurve:renderSegment(startpoint, endpoint, depth) end
 
 ---Rotate the Bézier curve by an angle.
 ---
----[Open in Browser](https://love2d.org/wiki/BezierCurve.rotate)
+---[Open in Browser](https://love2d.org/wiki/BezierCurve:rotate)
 ---
----@param angle number # Rotation angle in radians.
----@param ox number? # X coordinate of the rotation center. (Defaults to 0.)
----@param oy number? # Y coordinate of the rotation center. (Defaults to 0.)
+---@param self love.BezierCurve
+---@param angle number Rotation angle in radians.
+---@param ox number? X coordinate of the rotation center. (defaults to `0`.)
+---@param oy number? Y coordinate of the rotation center. (defaults to `0`.)
 function BezierCurve:rotate(angle, ox, oy) end
 
 ---Scale the Bézier curve by a factor.
 ---
----[Open in Browser](https://love2d.org/wiki/BezierCurve.scale)
+---[Open in Browser](https://love2d.org/wiki/BezierCurve:scale)
 ---
----@param s number # Scale factor.
----@param ox number? # X coordinate of the scaling center. (Defaults to 0.)
----@param oy number? # Y coordinate of the scaling center. (Defaults to 0.)
+---@param self love.BezierCurve
+---@param s number Scale factor.
+---@param ox number? X coordinate of the scaling center. (defaults to `0`.)
+---@param oy number? Y coordinate of the scaling center. (defaults to `0`.)
 function BezierCurve:scale(s, ox, oy) end
 
 ---Set coordinates of the i-th control point. Indices start with 1.
 ---
----[Open in Browser](https://love2d.org/wiki/BezierCurve.setControlPoint)
+---[Open in Browser](https://love2d.org/wiki/BezierCurve:setControlPoint)
 ---
----@param i number # Index of the control point.
----@param x number # Position of the control point along the x axis.
----@param y number # Position of the control point along the y axis.
+---@param self love.BezierCurve
+---@param i number Index of the control point.
+---@param x number Position of the control point along the x axis.
+---@param y number Position of the control point along the y axis.
 function BezierCurve:setControlPoint(i, x, y) end
 
 ---Move the Bézier curve by an offset.
 ---
----[Open in Browser](https://love2d.org/wiki/BezierCurve.translate)
+---[Open in Browser](https://love2d.org/wiki/BezierCurve:translate)
 ---
----@param dx number # Offset along the x axis.
----@param dy number # Offset along the y axis.
+---@param self love.BezierCurve
+---@param dx number Offset along the x axis.
+---@param dy number Offset along the y axis.
 function BezierCurve:translate(dx, dy) end
 
---endregion BezierCurve
+--endregion love.BezierCurve
 
---region RandomGenerator
+--region love.RandomGenerator
 
 ---A random number generation object which has its own random state.
 ---
 ---[Open in Browser](https://love2d.org/wiki/RandomGenerator)
 ---
----@class RandomGenerator : Object
+---@class love.RandomGenerator : love.Object
 local RandomGenerator = {}
+
 ---Gets the seed of the random number generator object.
 ---
 ---The seed is split into two numbers due to Lua's use of doubles for all number values - doubles can't accurately represent integer  values above 2^53, but the seed value is an integer number in the range of 2^64 - 1.
 ---
----[Open in Browser](https://love2d.org/wiki/RandomGenerator.getSeed)
+---[Open in Browser](https://love2d.org/wiki/RandomGenerator:getSeed)
 ---
----@return number, number
+---@param self love.RandomGenerator
+---@return number low Integer number representing the lower 32 bits of the RandomGenerator's 64 bit seed value.
+---@return number high Integer number representing the higher 32 bits of the RandomGenerator's 64 bit seed value.
 function RandomGenerator:getSeed() end
 
 ---Gets the current state of the random number generator. This returns an opaque string which is only useful for later use with RandomGenerator:setState in the same major version of LÖVE.
 ---
 ---This is different from RandomGenerator:getSeed in that getState gets the RandomGenerator's current state, whereas getSeed gets the previously set seed number.
 ---
----[Open in Browser](https://love2d.org/wiki/RandomGenerator.getState)
+---[Open in Browser](https://love2d.org/wiki/RandomGenerator:getState)
 ---
----@return string
+---The value of the state string does not depend on the current operating system.
+---@param self love.RandomGenerator
+---@return string state The current state of the RandomGenerator object, represented as a string.
 function RandomGenerator:getState() end
 
 ---Generates a pseudo-random number in a platform independent manner.
 ---
----[Open in Browser](https://love2d.org/wiki/RandomGenerator.random)
----
----@param min number # The minimum possible value it should return.
----@param max number # The maximum possible value it should return.
----@return number
+---[Open in Browser](https://love2d.org/wiki/RandomGenerator:random)
 ---
 ---Get uniformly distributed pseudo-random integer number within max.
----@overload fun(self:RandomGenerator, max:number):number
----
+---@param self love.RandomGenerator
+---@param min number The minimum possible value it should return.
+---@param max number The maximum possible value it should return.
+---@return number number The pseudo-random integer number.
+---Get uniformly distributed pseudo-random integer number within max.
+---@overload fun(self: love.RandomGenerator, max: number): number
 ---Get uniformly distributed pseudo-random number within 1.
----@overload fun(self:RandomGenerator):number
+---@overload fun(self: love.RandomGenerator): number
 function RandomGenerator:random(min, max) end
 
 ---Get a normally distributed pseudo random number.
 ---
----[Open in Browser](https://love2d.org/wiki/RandomGenerator.randomNormal)
+---[Open in Browser](https://love2d.org/wiki/RandomGenerator:randomNormal)
 ---
----@param stddev number? # Standard deviation of the distribution. (Defaults to 1.)
----@param mean number? # The mean of the distribution. (Defaults to 0.)
----@return number
+---@param self love.RandomGenerator
+---@param stddev number Standard deviation of the distribution. (defaults to `1`.)
+---@param mean number? The mean of the distribution. (defaults to `0`.)
+---@return number number Normally distributed random number with variance (stddev)² and the specified mean.
 function RandomGenerator:randomNormal(stddev, mean) end
 
 ---Sets the seed of the random number generator using the specified integer number.
 ---
----[Open in Browser](https://love2d.org/wiki/RandomGenerator.setSeed)
+---[Open in Browser](https://love2d.org/wiki/RandomGenerator:setSeed)
 ---
----@param low number # The lower 32 bits of the seed value. Must be within the range of 2^32 - 1.
----@param high number # The higher 32 bits of the seed value. Must be within the range of 2^32 - 1.
----
+---Combines two 32-bit integer numbers into a 64-bit integer value and sets the seed of the random number generator using the value.
+---@param self love.RandomGenerator
+---@param low number The lower 32 bits of the seed value. Must be within the range of 2^32 - 1.
+---@param high number The higher 32 bits of the seed value. Must be within the range of 2^32 - 1.
 ---Due to Lua's use of double-precision floating point numbers, values above 2^53 cannot be accurately represented. Use the other variant of this function if your seed will have a larger value.
----@overload fun(self:RandomGenerator, seed:number):nil
+---@overload fun(self: love.RandomGenerator, seed: number): nil
 function RandomGenerator:setSeed(low, high) end
 
 ---Sets the current state of the random number generator. The value used as an argument for this function is an opaque string and should only originate from a previous call to RandomGenerator:getState in the same major version of LÖVE.
 ---
 ---This is different from RandomGenerator:setSeed in that setState directly sets the RandomGenerator's current implementation-dependent state, whereas setSeed gives it a new seed value.
 ---
----[Open in Browser](https://love2d.org/wiki/RandomGenerator.setState)
+---[Open in Browser](https://love2d.org/wiki/RandomGenerator:setState)
 ---
----@param state string # The new state of the RandomGenerator object, represented as a string. This should originate from a previous call to RandomGenerator:getState.
+---The effect of the state string does not depend on the current operating system.
+---@param self love.RandomGenerator
+---@param state string The new state of the RandomGenerator object, represented as a string. This should originate from a previous call to RandomGenerator:getState.
 function RandomGenerator:setState(state) end
 
---endregion RandomGenerator
+--endregion love.RandomGenerator
 
---region Transform
+--region love.Transform
 
 ---Object containing a coordinate system transformation.
 ---
@@ -223,37 +252,57 @@ function RandomGenerator:setState(state) end
 ---
 ---[Open in Browser](https://love2d.org/wiki/Transform)
 ---
----@class Transform : Object
+---@class love.Transform : love.Object
 local Transform = {}
+
 ---Applies the given other Transform object to this one.
 ---
 ---This effectively multiplies this Transform's internal transformation matrix with the other Transform's (i.e. self * other), and stores the result in this object.
 ---
----[Open in Browser](https://love2d.org/wiki/Transform.apply)
+---[Open in Browser](https://love2d.org/wiki/Transform:apply)
 ---
----@param other love.Transform # The other Transform object to apply to this Transform.
----@return love.Transform
+---@param self love.Transform
+---@param other love.Transform The other Transform object to apply to this Transform.
+---@return love.Transform transform The Transform object the method was called on. Allows easily chaining Transform methods.
 function Transform:apply(other) end
 
 ---Creates a new copy of this Transform.
 ---
----[Open in Browser](https://love2d.org/wiki/Transform.clone)
+---[Open in Browser](https://love2d.org/wiki/Transform:clone)
 ---
----@return love.Transform
+---@param self love.Transform
+---@return love.Transform clone The copy of this Transform.
 function Transform:clone() end
 
 ---Gets the internal 4x4 transformation matrix stored by this Transform. The matrix is returned in row-major order.
 ---
----[Open in Browser](https://love2d.org/wiki/Transform.getMatrix)
+---[Open in Browser](https://love2d.org/wiki/Transform:getMatrix)
 ---
----@return number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number
+---@param self love.Transform
+---@return number e1_1 The first column of the first row of the matrix.
+---@return number e1_2 The second column of the first row of the matrix.
+---@return number e1_3 The third column of the first row of the matrix.
+---@return number e1_4 The fourth column of the first row of the matrix.
+---@return number e2_1 The first column of the second row of the matrix.
+---@return number e2_2 The second column of the second row of the matrix.
+---@return number e2_3 The third column of the second row of the matrix.
+---@return number e2_4 The fourth column of the second row of the matrix.
+---@return number e3_1 The first column of the third row of the matrix.
+---@return number e3_2 The second column of the third row of the matrix.
+---@return number e3_3 The third column of the third row of the matrix.
+---@return number e3_4 The fourth column of the third row of the matrix.
+---@return number e4_1 The first column of the fourth row of the matrix.
+---@return number e4_2 The second column of the fourth row of the matrix.
+---@return number e4_3 The third column of the fourth row of the matrix.
+---@return number e4_4 The fourth column of the fourth row of the matrix.
 function Transform:getMatrix() end
 
 ---Creates a new Transform containing the inverse of this Transform.
 ---
----[Open in Browser](https://love2d.org/wiki/Transform.inverse)
+---[Open in Browser](https://love2d.org/wiki/Transform:inverse)
 ---
----@return love.Transform
+---@param self love.Transform
+---@return love.Transform inverse A new Transform object representing the inverse of this Transform's matrix.
 function Transform:inverse() end
 
 ---Applies the reverse of the Transform object's transformation to the given 2D position.
@@ -262,146 +311,222 @@ function Transform:inverse() end
 ---
 ---One use of this method can be to convert a screen-space mouse position into global world coordinates, if the given Transform has transformations applied that are used for a camera system in-game.
 ---
----[Open in Browser](https://love2d.org/wiki/Transform.inverseTransformPoint)
+---[Open in Browser](https://love2d.org/wiki/Transform:inverseTransformPoint)
 ---
----@param localX number # The x component of the position with the transform applied.
----@param localY number # The y component of the position with the transform applied.
----@return number, number
+---@param self love.Transform
+---@param localX number The x component of the position with the transform applied.
+---@param localY number The y component of the position with the transform applied.
+---@return number globalX The x component of the position in global coordinates.
+---@return number globalY The y component of the position in global coordinates.
 function Transform:inverseTransformPoint(localX, localY) end
 
 ---Checks whether the Transform is an affine transformation.
 ---
----[Open in Browser](https://love2d.org/wiki/Transform.isAffine2DTransform)
+---[Open in Browser](https://love2d.org/wiki/Transform:isAffine2DTransform)
 ---
----@return boolean
+---@param self love.Transform
+---@return boolean affine true if the transform object is an affine transformation, false otherwise.
 function Transform:isAffine2DTransform() end
 
 ---Resets the Transform to an identity state. All previously applied transformations are erased.
 ---
----[Open in Browser](https://love2d.org/wiki/Transform.reset)
+---[Open in Browser](https://love2d.org/wiki/Transform:reset)
 ---
----@return love.Transform
+---@param self love.Transform
+---@return love.Transform transform The Transform object the method was called on. Allows easily chaining Transform methods.
 function Transform:reset() end
 
 ---Applies a rotation to the Transform's coordinate system. This method does not reset any previously applied transformations.
 ---
----[Open in Browser](https://love2d.org/wiki/Transform.rotate)
+---[Open in Browser](https://love2d.org/wiki/Transform:rotate)
 ---
----@param angle number # The relative angle in radians to rotate this Transform by.
----@return love.Transform
+---@param self love.Transform
+---@param angle number The relative angle in radians to rotate this Transform by.
+---@return love.Transform transform The Transform object the method was called on. Allows easily chaining Transform methods.
 function Transform:rotate(angle) end
 
 ---Scales the Transform's coordinate system. This method does not reset any previously applied transformations.
 ---
----[Open in Browser](https://love2d.org/wiki/Transform.scale)
+---[Open in Browser](https://love2d.org/wiki/Transform:scale)
 ---
----@param sx number # The relative scale factor along the x-axis.
----@param sy number? # The relative scale factor along the y-axis. (Defaults to sx.)
----@return love.Transform
+---@param self love.Transform
+---@param sx number The relative scale factor along the x-axis.
+---@param sy number? The relative scale factor along the y-axis. (defaults to `sx`.)
+---@return love.Transform transform The Transform object the method was called on. Allows easily chaining Transform methods.
 function Transform:scale(sx, sy) end
 
 ---Directly sets the Transform's internal 4x4 transformation matrix.
 ---
----[Open in Browser](https://love2d.org/wiki/Transform.setMatrix)
+---[Open in Browser](https://love2d.org/wiki/Transform:setMatrix)
 ---
----@param layout love.MatrixLayout # How to interpret the matrix element arguments (row-major or column-major).
----@param e1_1 number # The first column of the first row of the matrix.
----@param e1_2 number # The second column of the first row or the first column of the second row of the matrix, depending on the specified layout.
----@param e1_3 number # The third column/row of the first row/column of the matrix.
----@param e1_4 number # The fourth column/row of the first row/column of the matrix.
----@param e2_1 number # The first column/row of the second row/column of the matrix.
----@param e2_2 number # The second column/row of the second row/column of the matrix.
----@param e2_3 number # The third column/row of the second row/column of the matrix.
----@param e2_4 number # The fourth column/row of the second row/column of the matrix.
----@param e3_1 number # The first column/row of the third row/column of the matrix.
----@param e3_2 number # The second column/row of the third row/column of the matrix.
----@param e3_3 number # The third column/row of the third row/column of the matrix.
----@param e3_4 number # The fourth column/row of the third row/column of the matrix.
----@param e4_1 number # The first column/row of the fourth row/column of the matrix.
----@param e4_2 number # The second column/row of the fourth row/column of the matrix.
----@param e4_3 number # The third column/row of the fourth row/column of the matrix.
----@param e4_4 number # The fourth column of the fourth row of the matrix.
----@return love.Transform
----@overload fun(self:Transform, e1_1:number, e1_2:number, e1_3:number, e1_4:number, e2_1:number, e2_2:number, e2_3:number, e2_4:number, e3_1:number, e3_2:number, e3_3:number, e3_4:number, e4_1:number, e4_2:number, e4_3:number, e4_4:number):love.Transform
----@overload fun(self:Transform, layout:love.MatrixLayout, matrix:table):love.Transform
----@overload fun(self:Transform, layout:love.MatrixLayout, matrix:table):love.Transform
+---@param self love.Transform
+---@param layout love.MatrixLayout How to interpret the matrix element arguments (row-major or column-major).
+---@param e1_1 number The first column of the first row of the matrix.
+---@param e1_2 number The second column of the first row or the first column of the second row of the matrix, depending on the specified layout.
+---@param e1_3 number The third column/row of the first row/column of the matrix.
+---@param e1_4 number The fourth column/row of the first row/column of the matrix.
+---@param e2_1 number The first column/row of the second row/column of the matrix.
+---@param e2_2 number The second column/row of the second row/column of the matrix.
+---@param e2_3 number The third column/row of the second row/column of the matrix.
+---@param e2_4 number The fourth column/row of the second row/column of the matrix.
+---@param e3_1 number The first column/row of the third row/column of the matrix.
+---@param e3_2 number The second column/row of the third row/column of the matrix.
+---@param e3_3 number The third column/row of the third row/column of the matrix.
+---@param e3_4 number The fourth column/row of the third row/column of the matrix.
+---@param e4_1 number The first column/row of the fourth row/column of the matrix.
+---@param e4_2 number The second column/row of the fourth row/column of the matrix.
+---@param e4_3 number The third column/row of the fourth row/column of the matrix.
+---@param e4_4 number The fourth column of the fourth row of the matrix.
+---@return love.Transform transform The Transform object the method was called on. Allows easily chaining Transform methods.
+---@overload fun(self: love.Transform, e1_1: number, e1_2: number, e1_3: number, e1_4: number, e2_1: number, e2_2: number, e2_3: number, e2_4: number, e3_1: number, e3_2: number, e3_3: number, e3_4: number, e4_1: number, e4_2: number, e4_3: number, e4_4: number): love.Transform
+---@overload fun(self: love.Transform, layout: love.MatrixLayout, matrix: table): love.Transform
+---@overload fun(self: love.Transform, layout: love.MatrixLayout, matrix: table): love.Transform
 function Transform:setMatrix(layout, e1_1, e1_2, e1_3, e1_4, e2_1, e2_2, e2_3, e2_4, e3_1, e3_2, e3_3, e3_4, e4_1, e4_2, e4_3, e4_4) end
 
 ---Resets the Transform to the specified transformation parameters.
 ---
----[Open in Browser](https://love2d.org/wiki/Transform.setTransformation)
+---[Open in Browser](https://love2d.org/wiki/Transform:setTransformation)
 ---
----@param x number # The position of the Transform on the x-axis.
----@param y number # The position of the Transform on the y-axis.
----@param angle number? # The orientation of the Transform in radians. (Defaults to 0.)
----@param sx number? # Scale factor on the x-axis. (Defaults to 1.)
----@param sy number? # Scale factor on the y-axis. (Defaults to sx.)
----@param ox number? # Origin offset on the x-axis. (Defaults to 0.)
----@param oy number? # Origin offset on the y-axis. (Defaults to 0.)
----@param kx number? # Shearing / skew factor on the x-axis. (Defaults to 0.)
----@param ky number? # Shearing / skew factor on the y-axis. (Defaults to 0.)
----@return love.Transform
+---@param self love.Transform
+---@param x number The position of the Transform on the x-axis.
+---@param y number The position of the Transform on the y-axis.
+---@param angle number? The orientation of the Transform in radians. (defaults to `0`.)
+---@param sx number? Scale factor on the x-axis. (defaults to `1`.)
+---@param sy number? Scale factor on the y-axis. (defaults to `sx`.)
+---@param ox number? Origin offset on the x-axis. (defaults to `0`.)
+---@param oy number? Origin offset on the y-axis. (defaults to `0`.)
+---@param kx number? Shearing / skew factor on the x-axis. (defaults to `0`.)
+---@param ky number? Shearing / skew factor on the y-axis. (defaults to `0`.)
+---@return love.Transform transform The Transform object the method was called on. Allows easily chaining Transform methods.
 function Transform:setTransformation(x, y, angle, sx, sy, ox, oy, kx, ky) end
 
 ---Applies a shear factor (skew) to the Transform's coordinate system. This method does not reset any previously applied transformations.
 ---
----[Open in Browser](https://love2d.org/wiki/Transform.shear)
+---[Open in Browser](https://love2d.org/wiki/Transform:shear)
 ---
----@param kx number # The shear factor along the x-axis.
----@param ky number # The shear factor along the y-axis.
----@return love.Transform
+---@param self love.Transform
+---@param kx number The shear factor along the x-axis.
+---@param ky number The shear factor along the y-axis.
+---@return love.Transform transform The Transform object the method was called on. Allows easily chaining Transform methods.
 function Transform:shear(kx, ky) end
 
 ---Applies the Transform object's transformation to the given 2D position.
 ---
 ---This effectively converts the given position from global coordinates into the local coordinate space of the Transform.
 ---
----[Open in Browser](https://love2d.org/wiki/Transform.transformPoint)
+---[Open in Browser](https://love2d.org/wiki/Transform:transformPoint)
 ---
----@param globalX number # The x component of the position in global coordinates.
----@param globalY number # The y component of the position in global coordinates.
----@return number, number
+---@param self love.Transform
+---@param globalX number The x component of the position in global coordinates.
+---@param globalY number The y component of the position in global coordinates.
+---@return number localX The x component of the position with the transform applied.
+---@return number localY The y component of the position with the transform applied.
 function Transform:transformPoint(globalX, globalY) end
 
 ---Applies a translation to the Transform's coordinate system. This method does not reset any previously applied transformations.
 ---
----[Open in Browser](https://love2d.org/wiki/Transform.translate)
+---[Open in Browser](https://love2d.org/wiki/Transform:translate)
 ---
----@param dx number # The relative translation along the x-axis.
----@param dy number # The relative translation along the y-axis.
----@return love.Transform
+---@param self love.Transform
+---@param dx number The relative translation along the x-axis.
+---@param dy number The relative translation along the y-axis.
+---@return love.Transform transform The Transform object the method was called on. Allows easily chaining Transform methods.
 function Transform:translate(dx, dy) end
 
---endregion Transform
+--endregion love.Transform
 
 ---The layout of matrix elements (row-major or column-major).
 ---
 ---[Open in Browser](https://love2d.org/wiki/MatrixLayout)
 ---
----@alias MatrixLayout
----| "row" -- The matrix is row-major:
----| "column" -- The matrix is column-major:
+---@alias love.MatrixLayout
+---| "row" # The matrix is row-major:
+---| "column" # The matrix is column-major:
 
 ---Converts a color from 0..255 to 0..1 range.
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.math.colorFromBytes)
 ---
----@param rb number # Red color component in 0..255 range.
----@param gb number # Green color component in 0..255 range.
----@param bb number # Blue color component in 0..255 range.
----@param ab number? # Alpha color component in 0..255 range. (Defaults to nil.)
----@return number, number, number, number
+---Here's implementation for 11.2 and earlier.
+---
+---function love.math.colorFromBytes(r, g, b, a)
+---
+---	if type(r) == 'table' then
+---
+---		r, g, b, a = rr[2, rr[4
+---
+---	end
+---
+---	r = clamp01(floor(r + 0.5) / 255)
+---
+---	g = clamp01(floor(g + 0.5) / 255)
+---
+---	b = clamp01(floor(b + 0.5) / 255)
+---
+---	a = a ~= nil and clamp01(floor(a + 0.5) / 255) or nil
+---
+---	return r, g, b, a
+---
+---end
+---
+---Where clamp01 is defined as follows
+---
+---local function clamp01(x)
+---
+---	return math.min(math.max(x, 0), 1)
+---
+---end
+---@param rb number Red color component in 0..255 range.
+---@param gb number Green color component in 0..255 range.
+---@param bb number Blue color component in 0..255 range.
+---@param ab number? Alpha color component in 0..255 range. (defaults to `nil`.)
+---@return number r Red color component in 0..1 range.
+---@return number g Green color component in 0..1 range.
+---@return number b Blue color component in 0..1 range.
+---@return number a Alpha color component in 0..1 range or nil if alpha is not specified.
 function love.math.colorFromBytes(rb, gb, bb, ab) end
 
 ---Converts a color from 0..1 to 0..255 range.
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.math.colorToBytes)
 ---
----@param r number # Red color component.
----@param g number # Green color component.
----@param b number # Blue color component.
----@param a number? # Alpha color component. (Defaults to nil.)
----@return number, number, number, number
+---Here's implementation for 11.2 and earlier.
+---
+---function love.math.colorToBytes(r, g, b, a)
+---
+---	if type(r) == 'table' then
+---
+---		r, g, b, a = rr[2, rr[4
+---
+---	end
+---
+---	r = floor(clamp01(r) * 255 + 0.5)
+---
+---	g = floor(clamp01(g) * 255 + 0.5)
+---
+---	b = floor(clamp01(b) * 255 + 0.5)
+---
+---	a = a ~= nil and floor(clamp01(a) * 255 + 0.5) or nil
+---
+---	return r, g, b, a
+---
+---end
+---
+---Where clamp01 is defined as follows
+---
+---local function clamp01(x)
+---
+---	return math.min(math.max(x, 0), 1)
+---
+---end
+---@param r number Red color component.
+---@param g number Green color component.
+---@param b number Blue color component.
+---@param a number? Alpha color component. (defaults to `nil`.)
+---@return number rb Red color component in 0..255 range.
+---@return number gb Green color component in 0..255 range.
+---@return number bb Blue color component in 0..255 range.
+---@return number ab Alpha color component in 0..255 range or nil if alpha is not specified.
 function love.math.colorToBytes(r, g, b, a) end
 
 ---Converts a color from gamma-space (sRGB) to linear-space (RGB). This is useful when doing gamma-correct rendering and you need to do math in linear RGB in the few cases where LÖVE doesn't handle conversions automatically.
@@ -412,12 +537,15 @@ function love.math.colorToBytes(r, g, b, a) end
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.math.gammaToLinear)
 ---
----@param r number # The red channel of the sRGB color to convert.
----@param g number # The green channel of the sRGB color to convert.
----@param b number # The blue channel of the sRGB color to convert.
----@return number, number, number
----@overload fun(color:table):number, number, number
----@overload fun(c:number):number
+---An alpha value can be passed into the function as a fourth argument, but it will be returned unchanged because alpha is always linear.
+---@param r number The red channel of the sRGB color to convert.
+---@param g number The green channel of the sRGB color to convert.
+---@param b number The blue channel of the sRGB color to convert.
+---@return number lr The red channel of the converted color in linear RGB space.
+---@return number lg The green channel of the converted color in linear RGB space.
+---@return number lb The blue channel of the converted color in linear RGB space.
+---@overload fun(color: table): number, number, number
+---@overload fun(c: number): number
 function love.math.gammaToLinear(r, g, b) end
 
 ---Gets the seed of the random number generator.
@@ -426,7 +554,8 @@ function love.math.gammaToLinear(r, g, b) end
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.math.getRandomSeed)
 ---
----@return number, number
+---@return number low Integer number representing the lower 32 bits of the random number generator's 64 bit seed value.
+---@return number high Integer number representing the higher 32 bits of the random number generator's 64 bit seed value.
 function love.math.getRandomSeed() end
 
 ---Gets the current state of the random number generator. This returns an opaque implementation-dependent string which is only useful for later use with love.math.setRandomState or RandomGenerator:setState.
@@ -435,7 +564,8 @@ function love.math.getRandomSeed() end
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.math.getRandomState)
 ---
----@return string
+---The value of the state string does not depend on the current operating system.
+---@return string state The current state of the random number generator, represented as a string.
 function love.math.getRandomState() end
 
 ---Checks whether a polygon is convex.
@@ -444,13 +574,12 @@ function love.math.getRandomState() end
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.math.isConvex)
 ---
----@param x1 number # The position of the first vertex of the polygon on the x-axis.
----@param y1 number # The position of the first vertex of the polygon on the y-axis.
----@param x2 number # The position of the second vertex of the polygon on the x-axis.
----@param y2 number # The position of the second vertex of the polygon on the y-axis.
----@vararg number # Additional position of the vertex of the polygon on the x-axis and y-axis.
----@return boolean
----@overload fun(vertices:table):boolean
+---@param x1 number The position of the first vertex of the polygon on the x-axis.
+---@param y1 number The position of the first vertex of the polygon on the y-axis.
+---@param x2 number The position of the second vertex of the polygon on the x-axis.
+---@param y2 number The position of the second vertex of the polygon on the y-axis.
+---@return boolean convex Whether the given polygon is convex.
+---@overload fun(vertices: table): boolean
 function love.math.isConvex(x1, y1, x2, y2, ...) end
 
 ---Converts a color from linear-space (RGB) to gamma-space (sRGB). This is useful when storing linear RGB color values in an image, because the linear RGB color space has less precision than sRGB for dark colors, which can result in noticeable color banding when drawing.
@@ -463,12 +592,15 @@ function love.math.isConvex(x1, y1, x2, y2, ...) end
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.math.linearToGamma)
 ---
----@param lr number # The red channel of the linear RGB color to convert.
----@param lg number # The green channel of the linear RGB color to convert.
----@param lb number # The blue channel of the linear RGB color to convert.
----@return number, number, number
----@overload fun(color:table):number, number, number
----@overload fun(lc:number):number
+---An alpha value can be passed into the function as a fourth argument, but it will be returned unchanged because alpha is always linear.
+---@param lr number The red channel of the linear RGB color to convert.
+---@param lg number The green channel of the linear RGB color to convert.
+---@param lb number The blue channel of the linear RGB color to convert.
+---@return number cr The red channel of the converted color in gamma sRGB space.
+---@return number cg The green channel of the converted color in gamma sRGB space.
+---@return number cb The blue channel of the converted color in gamma sRGB space.
+---@overload fun(color: table): number, number, number
+---@overload fun(lc: number): number
 function love.math.linearToGamma(lr, lg, lb) end
 
 ---Creates a new BezierCurve object.
@@ -477,45 +609,44 @@ function love.math.linearToGamma(lr, lg, lb) end
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.math.newBezierCurve)
 ---
----@param x1 number # The position of the first vertex of the control polygon on the x-axis.
----@param y1 number # The position of the first vertex of the control polygon on the y-axis.
----@param x2 number # The position of the second vertex of the control polygon on the x-axis.
----@param y2 number # The position of the second vertex of the control polygon on the y-axis.
----@vararg number # Additional position of the vertex of the control polygon on the x-axis and y-axis.
----@return love.BezierCurve
----@overload fun(vertices:table):love.BezierCurve
+---@param x1 number The position of the first vertex of the control polygon on the x-axis.
+---@param y1 number The position of the first vertex of the control polygon on the y-axis.
+---@param x2 number The position of the second vertex of the control polygon on the x-axis.
+---@param y2 number The position of the second vertex of the control polygon on the y-axis.
+---@return love.BezierCurve curve A Bézier curve object.
+---@overload fun(vertices: table): love.BezierCurve
 function love.math.newBezierCurve(x1, y1, x2, y2, ...) end
 
 ---Creates a new RandomGenerator object which is completely independent of other RandomGenerator objects and random functions.
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.math.newRandomGenerator)
 ---
----@param low number # The lower 32 bits of the seed number to use for this object.
----@param high number # The higher 32 bits of the seed number to use for this object.
----@return love.RandomGenerator
----
 ---See RandomGenerator:setSeed.
----@overload fun(seed:number):love.RandomGenerator
----@overload fun():love.RandomGenerator
+---@param low number The lower 32 bits of the seed number to use for this object.
+---@param high number The higher 32 bits of the seed number to use for this object.
+---@return love.RandomGenerator rng The new Random Number Generator object.
+---See RandomGenerator:setSeed.
+---@overload fun(seed: number): love.RandomGenerator
+---@overload fun(): love.RandomGenerator
 function love.math.newRandomGenerator(low, high) end
 
 ---Creates a new Transform object.
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.math.newTransform)
 ---
----@param x number # The position of the new Transform on the x-axis.
----@param y number # The position of the new Transform on the y-axis.
----@param angle number? # The orientation of the new Transform in radians. (Defaults to 0.)
----@param sx number? # Scale factor on the x-axis. (Defaults to 1.)
----@param sy number? # Scale factor on the y-axis. (Defaults to sx.)
----@param ox number? # Origin offset on the x-axis. (Defaults to 0.)
----@param oy number? # Origin offset on the y-axis. (Defaults to 0.)
----@param kx number? # Shearing / skew factor on the x-axis. (Defaults to 0.)
----@param ky number? # Shearing / skew factor on the y-axis. (Defaults to 0.)
----@return love.Transform
----
+---Creates a Transform with the specified transformation applied on creation.
+---@param x number The position of the new Transform on the x-axis.
+---@param y number The position of the new Transform on the y-axis.
+---@param angle number? The orientation of the new Transform in radians. (defaults to `0`.)
+---@param sx number? Scale factor on the x-axis. (defaults to `1`.)
+---@param sy number? Scale factor on the y-axis. (defaults to `sx`.)
+---@param ox number? Origin offset on the x-axis. (defaults to `0`.)
+---@param oy number? Origin offset on the y-axis. (defaults to `0`.)
+---@param kx number? Shearing / skew factor on the x-axis. (defaults to `0`.)
+---@param ky number? Shearing / skew factor on the y-axis. (defaults to `0`.)
+---@return love.Transform transform The new Transform object.
 ---Creates a Transform with no transformations applied. Call methods on the returned object to apply transformations.
----@overload fun():love.Transform
+---@overload fun(): love.Transform
 function love.math.newTransform(x, y, angle, sx, sy, ox, oy, kx, ky) end
 
 ---Generates a Simplex or Perlin noise value in 1-4 dimensions. The return value will always be the same, given the same arguments.
@@ -526,55 +657,52 @@ function love.math.newTransform(x, y, angle, sx, sy, ox, oy, kx, ky) end
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.math.noise)
 ---
----@param x number # The first value of the 4-dimensional vector used to generate the noise value.
----@param y number # The second value of the 4-dimensional vector used to generate the noise value.
----@param z number # The third value of the 4-dimensional vector used to generate the noise value.
----@param w number # The fourth value of the 4-dimensional vector used to generate the noise value.
----@return number
----
+---Generates Perlin noise (Simplex noise in version 0.9.2 and older) from 4 dimensions.
+---@param x number The first value of the 4-dimensional vector used to generate the noise value.
+---@param y number The second value of the 4-dimensional vector used to generate the noise value.
+---@param z number The third value of the 4-dimensional vector used to generate the noise value.
+---@param w number The fourth value of the 4-dimensional vector used to generate the noise value.
+---@return number value The noise value in the range of 1.
 ---Generates Perlin noise (Simplex noise in version 0.9.2 and older) from 3 dimensions.
----@overload fun(x:number, y:number, z:number):number
----
+---@overload fun(x: number, y: number, z: number): number
 ---Generates Simplex noise from 2 dimensions.
----@overload fun(x:number, y:number):number
----
+---@overload fun(x: number, y: number): number
 ---Generates Simplex noise from 1 dimension.
----@overload fun(x:number):number
+---@overload fun(x: number): number
 function love.math.noise(x, y, z, w) end
 
 ---Generates a pseudo-random number in a platform independent manner. The default love.run seeds this function at startup, so you generally don't need to seed it yourself.
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.math.random)
 ---
----@param min number # The minimum possible value it should return.
----@param max number # The maximum possible value it should return.
----@return number
----
+---Get uniformly distributed pseudo-random integer within max.
+---@param min number The minimum possible value it should return.
+---@param max number The maximum possible value it should return.
+---@return number number The pseudo-random integer number.
 ---Get a uniformly distributed pseudo-random integer within max.
----@overload fun(max:number):number
----
+---@overload fun(max: number): number
 ---Get uniformly distributed pseudo-random real number within 1.
----@overload fun():number
+---@overload fun(): number
 function love.math.random(min, max) end
 
 ---Get a normally distributed pseudo random number.
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.math.randomNormal)
 ---
----@param stddev number? # Standard deviation of the distribution. (Defaults to 1.)
----@param mean number? # The mean of the distribution. (Defaults to 0.)
----@return number
+---@param stddev number Standard deviation of the distribution. (defaults to `1`.)
+---@param mean number? The mean of the distribution. (defaults to `0`.)
+---@return number number Normally distributed random number with variance (stddev)² and the specified mean.
 function love.math.randomNormal(stddev, mean) end
 
 ---Sets the seed of the random number generator using the specified integer number. This is called internally at startup, so you generally don't need to call it yourself.
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.math.setRandomSeed)
 ---
----@param low number # The lower 32 bits of the seed value. Must be within the range of 2^32 - 1.
----@param high number # The higher 32 bits of the seed value. Must be within the range of 2^32 - 1.
----
+---Combines two 32-bit integer numbers into a 64-bit integer value and sets the seed of the random number generator using the value.
+---@param low number The lower 32 bits of the seed value. Must be within the range of 2^32 - 1.
+---@param high number The higher 32 bits of the seed value. Must be within the range of 2^32 - 1.
 ---Due to Lua's use of double-precision floating point numbers, integer values above 2^53 cannot be accurately represented. Use the other variant of the function if you want to use a larger number.
----@overload fun(seed:number):nil
+---@overload fun(seed: number): nil
 function love.math.setRandomSeed(low, high) end
 
 ---Sets the current state of the random number generator. The value used as an argument for this function is an opaque implementation-dependent string and should only originate from a previous call to love.math.getRandomState.
@@ -583,20 +711,21 @@ function love.math.setRandomSeed(low, high) end
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.math.setRandomState)
 ---
----@param state string # The new state of the random number generator, represented as a string. This should originate from a previous call to love.math.getRandomState.
+---The effect of the state string does not depend on the current operating system.
+---@param state string The new state of the random number generator, represented as a string. This should originate from a previous call to love.math.getRandomState.
 function love.math.setRandomState(state) end
 
 ---Decomposes a simple convex or concave polygon into triangles.
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.math.triangulate)
 ---
----@param x1 number # The position of the first vertex of the polygon on the x-axis.
----@param y1 number # The position of the first vertex of the polygon on the y-axis.
----@param x2 number # The position of the second vertex of the polygon on the x-axis.
----@param y2 number # The position of the second vertex of the polygon on the y-axis.
----@param x3 number # The position of the third vertex of the polygon on the x-axis.
----@param y3 number # The position of the third vertex of the polygon on the y-axis.
----@return table
----@overload fun(polygon:table):table
+---@param x1 number The position of the first vertex of the polygon on the x-axis.
+---@param y1 number The position of the first vertex of the polygon on the y-axis.
+---@param x2 number The position of the second vertex of the polygon on the x-axis.
+---@param y2 number The position of the second vertex of the polygon on the y-axis.
+---@param x3 number The position of the third vertex of the polygon on the x-axis.
+---@param y3 number The position of the third vertex of the polygon on the y-axis.
+---@return table triangles List of triangles the polygon is composed of, in the form of {{x1, y1, x2, y2, x3, y3},  {x1, y1, x2, y2, x3, y3}, ...}.
+---@overload fun(polygon: table): table
 function love.math.triangulate(x1, y1, x2, y2, x3, y3) end
 

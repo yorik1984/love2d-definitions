@@ -1,24 +1,29 @@
----@meta
----@namespace love
+---@meta love2d
 
 ---Can simulate 2D rigid body physics in a realistic manner. This module is based on Box2D, and this API corresponds to the Box2D API as closely as possible.
+---
+---[Open in Browser](https://love2d.org/wiki/love.physics)
+---
+---@class love.physics
 love.physics = {}
 
---region Body
+--region love.Body
 
 ---Bodies are objects with velocity and position.
 ---
 ---[Open in Browser](https://love2d.org/wiki/Body)
 ---
----@class Body : Object
+---@class love.Body : love.Object
 local Body = {}
+
 ---Applies an angular impulse to a body. This makes a single, instantaneous addition to the body momentum.
 ---
 ---A body with with a larger mass will react less. The reaction does '''not''' depend on the timestep, and is equivalent to applying a force continuously for 1 second. Impulses are best used to give a single push to a body. For a continuous push to a body it is better to use Body:applyForce.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.applyAngularImpulse)
+---[Open in Browser](https://love2d.org/wiki/Body:applyAngularImpulse)
 ---
----@param impulse number # The impulse in kilogram-square meter per second.
+---@param self love.Body
+---@param impulse number The impulse in kilogram-square meter per second.
 function Body:applyAngularImpulse(impulse) end
 
 ---Apply force to a Body.
@@ -29,13 +34,14 @@ function Body:applyAngularImpulse(impulse) end
 ---
 ---Note that the force components and position must be given in world coordinates.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.applyForce)
+---[Open in Browser](https://love2d.org/wiki/Body:applyForce)
 ---
----@param fx number # The x component of force to apply.
----@param fy number # The y component of force to apply.
----@param x number # The x position to apply the force.
----@param y number # The y position to apply the force.
----@overload fun(self:Body, fx:number, fy:number):nil
+---@param self love.Body
+---@param fx number The x component of force to apply.
+---@param fy number The y component of force to apply.
+---@param x number The x position to apply the force.
+---@param y number The y position to apply the force.
+---@overload fun(self: love.Body, fx: number, fy: number): nil
 function Body:applyForce(fx, fy, x, y) end
 
 ---Applies an impulse to a body.
@@ -48,30 +54,33 @@ function Body:applyForce(fx, fy, x, y) end
 ---
 ---Note that the impulse components and position must be given in world coordinates.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.applyLinearImpulse)
+---[Open in Browser](https://love2d.org/wiki/Body:applyLinearImpulse)
 ---
----@param ix number # The x component of the impulse.
----@param iy number # The y component of the impulse.
----@param x number # The x position to apply the impulse.
----@param y number # The y position to apply the impulse.
----@overload fun(self:Body, ix:number, iy:number):nil
+---@param self love.Body
+---@param ix number The x component of the impulse.
+---@param iy number The y component of the impulse.
+---@param x number The x position to apply the impulse.
+---@param y number The y position to apply the impulse.
+---@overload fun(self: love.Body, ix: number, iy: number): nil
 function Body:applyLinearImpulse(ix, iy, x, y) end
 
 ---Apply torque to a body.
 ---
 ---Torque is like a force that will change the angular velocity (spin) of a body. The effect will depend on the rotational inertia a body has.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.applyTorque)
+---[Open in Browser](https://love2d.org/wiki/Body:applyTorque)
 ---
----@param torque number # The torque to apply.
+---@param self love.Body
+---@param torque number The torque to apply.
 function Body:applyTorque(torque) end
 
 ---Explicitly destroys the Body and all fixtures and joints attached to it.
 ---
 ---An error will occur if you attempt to use the object after calling this function. In 0.7.2, when you don't have time to wait for garbage collection, this function may be used to free the object immediately.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.destroy)
+---[Open in Browser](https://love2d.org/wiki/Body:destroy)
 ---
+---@param self love.Body
 function Body:destroy() end
 
 ---Get the angle of the body.
@@ -80,9 +89,10 @@ function Body:destroy() end
 ---
 ---A value of 0 radians will mean 'looking to the right'. Although radians increase counter-clockwise, the y axis points down so it becomes ''clockwise'' from our point of view.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.getAngle)
+---[Open in Browser](https://love2d.org/wiki/Body:getAngle)
 ---
----@return number
+---@param self love.Body
+---@return number angle The angle in radians.
 function Body:getAngle() end
 
 ---Gets the Angular damping of the Body
@@ -93,9 +103,10 @@ function Body:getAngle() end
 ---
 ---Damping parameters should be between 0 and infinity, with 0 meaning no damping, and infinity meaning full damping. Normally you will use a damping value between 0 and 0.1.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.getAngularDamping)
+---[Open in Browser](https://love2d.org/wiki/Body:getAngularDamping)
 ---
----@return number
+---@param self love.Body
+---@return number damping The value of the angular damping.
 function Body:getAngularDamping() end
 
 ---Get the angular velocity of the Body.
@@ -106,46 +117,52 @@ function Body:getAngularDamping() end
 ---
 ---If you need the ''rate of change of position over time'', use Body:getLinearVelocity.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.getAngularVelocity)
+---[Open in Browser](https://love2d.org/wiki/Body:getAngularVelocity)
 ---
----@return number
+---@param self love.Body
+---@return number w The angular velocity in radians/second.
 function Body:getAngularVelocity() end
 
 ---Gets a list of all Contacts attached to the Body.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.getContacts)
+---[Open in Browser](https://love2d.org/wiki/Body:getContacts)
 ---
----@return table
+---@param self love.Body
+---@return love.Contact[] contacts A list with all contacts associated with the Body.
 function Body:getContacts() end
 
 ---Returns a table with all fixtures.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.getFixtures)
+---[Open in Browser](https://love2d.org/wiki/Body:getFixtures)
 ---
----@return table
+---@param self love.Body
+---@return love.Fixture[] fixtures A sequence with all fixtures.
 function Body:getFixtures() end
 
 ---Returns the gravity scale factor.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.getGravityScale)
+---[Open in Browser](https://love2d.org/wiki/Body:getGravityScale)
 ---
----@return number
+---@param self love.Body
+---@return number scale The gravity scale factor.
 function Body:getGravityScale() end
 
 ---Gets the rotational inertia of the body.
 ---
 ---The rotational inertia is how hard is it to make the body spin.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.getInertia)
+---[Open in Browser](https://love2d.org/wiki/Body:getInertia)
 ---
----@return number
+---@param self love.Body
+---@return number inertia The rotational inertial of the body.
 function Body:getInertia() end
 
 ---Returns a table containing the Joints attached to this Body.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.getJoints)
+---[Open in Browser](https://love2d.org/wiki/Body:getJoints)
 ---
----@return table
+---@param self love.Body
+---@return love.Joint[] joints A sequence with the Joints attached to the Body.
 function Body:getJoints() end
 
 ---Gets the linear damping of the Body.
@@ -154,9 +171,10 @@ function Body:getJoints() end
 ---
 ---Damping is not the same as friction - they can be modelled together.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.getLinearDamping)
+---[Open in Browser](https://love2d.org/wiki/Body:getLinearDamping)
 ---
----@return number
+---@param self love.Body
+---@return number damping The value of the linear damping.
 function Body:getLinearDamping() end
 
 ---Gets the linear velocity of the Body from its center of mass.
@@ -173,9 +191,11 @@ function Body:getLinearDamping() end
 ---
 ---See page 136 of 'Essential Mathematics for Games and Interactive Applications' for definitions of local and world coordinates.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.getLinearVelocity)
+---[Open in Browser](https://love2d.org/wiki/Body:getLinearVelocity)
 ---
----@return number, number
+---@param self love.Body
+---@return number x The x-component of the velocity vector
+---@return number y The y-component of the velocity vector
 function Body:getLinearVelocity() end
 
 ---Get the linear velocity of a point on the body.
@@ -184,11 +204,13 @@ function Body:getLinearVelocity() end
 ---
 ---The point on the body must given in local coordinates. Use Body:getLinearVelocityFromWorldPoint to specify this with world coordinates.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.getLinearVelocityFromLocalPoint)
+---[Open in Browser](https://love2d.org/wiki/Body:getLinearVelocityFromLocalPoint)
 ---
----@param x number # The x position to measure velocity.
----@param y number # The y position to measure velocity.
----@return number, number
+---@param self love.Body
+---@param x number The x position to measure velocity.
+---@param y number The y position to measure velocity.
+---@return number vx The x component of velocity at point (x,y).
+---@return number vy The y component of velocity at point (x,y).
 function Body:getLinearVelocityFromLocalPoint(x, y) end
 
 ---Get the linear velocity of a point on the body.
@@ -197,171 +219,210 @@ function Body:getLinearVelocityFromLocalPoint(x, y) end
 ---
 ---The point on the body must given in world coordinates. Use Body:getLinearVelocityFromLocalPoint to specify this with local coordinates.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.getLinearVelocityFromWorldPoint)
+---[Open in Browser](https://love2d.org/wiki/Body:getLinearVelocityFromWorldPoint)
 ---
----@param x number # The x position to measure velocity.
----@param y number # The y position to measure velocity.
----@return number, number
+---@param self love.Body
+---@param x number The x position to measure velocity.
+---@param y number The y position to measure velocity.
+---@return number vx The x component of velocity at point (x,y).
+---@return number vy The y component of velocity at point (x,y).
 function Body:getLinearVelocityFromWorldPoint(x, y) end
 
 ---Get the center of mass position in local coordinates.
 ---
 ---Use Body:getWorldCenter to get the center of mass in world coordinates.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.getLocalCenter)
+---[Open in Browser](https://love2d.org/wiki/Body:getLocalCenter)
 ---
----@return number, number
+---@param self love.Body
+---@return number x The x coordinate of the center of mass.
+---@return number y The y coordinate of the center of mass.
 function Body:getLocalCenter() end
 
 ---Transform a point from world coordinates to local coordinates.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.getLocalPoint)
+---[Open in Browser](https://love2d.org/wiki/Body:getLocalPoint)
 ---
----@param worldX number # The x position in world coordinates.
----@param worldY number # The y position in world coordinates.
----@return number, number
+---@param self love.Body
+---@param worldX number The x position in world coordinates.
+---@param worldY number The y position in world coordinates.
+---@return number localX The x position in local coordinates.
+---@return number localY The y position in local coordinates.
 function Body:getLocalPoint(worldX, worldY) end
 
 ---Transforms multiple points from world coordinates to local coordinates.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.getLocalPoints)
+---[Open in Browser](https://love2d.org/wiki/Body:getLocalPoints)
 ---
----@param x1 number # (Argument) The x position of the first point.
----@param y1 number # (Argument) The y position of the first point.
----@param x2 number # (Argument) The x position of the second point.
----@param y2 number # (Argument) The y position of the second point.
----@vararg number # (Argument) You can continue passing x and y position of the points.
----@return number, number, number, number, number
+---@param self love.Body
+---@param x1 number (Argument) The x position of the first point.
+---@param y1 number (Argument) The y position of the first point.
+---@param x2 number (Argument) The x position of the second point.
+---@param y2 number (Argument) The y position of the second point.
+---@return number x1 (Result) The transformed x position of the first point.
+---@return number y1 (Result) The transformed y position of the first point.
+---@return number x2 (Result) The transformed x position of the second point.
+---@return number y2 (Result) The transformed y position of the second point.
+---@return number (Result) Additional transformed x and y position of the points.
 function Body:getLocalPoints(x1, y1, x2, y2, ...) end
 
 ---Transform a vector from world coordinates to local coordinates.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.getLocalVector)
+---[Open in Browser](https://love2d.org/wiki/Body:getLocalVector)
 ---
----@param worldX number # The vector x component in world coordinates.
----@param worldY number # The vector y component in world coordinates.
----@return number, number
+---@param self love.Body
+---@param worldX number The vector x component in world coordinates.
+---@param worldY number The vector y component in world coordinates.
+---@return number localX The vector x component in local coordinates.
+---@return number localY The vector y component in local coordinates.
 function Body:getLocalVector(worldX, worldY) end
 
 ---Get the mass of the body.
 ---
 ---Static bodies always have a mass of 0.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.getMass)
+---[Open in Browser](https://love2d.org/wiki/Body:getMass)
 ---
----@return number
+---@param self love.Body
+---@return number mass The mass of the body (in kilograms).
 function Body:getMass() end
 
 ---Returns the mass, its center, and the rotational inertia.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.getMassData)
+---[Open in Browser](https://love2d.org/wiki/Body:getMassData)
 ---
----@return number, number, number, number
+---@param self love.Body
+---@return number x The x position of the center of mass.
+---@return number y The y position of the center of mass.
+---@return number mass The mass of the body.
+---@return number inertia The rotational inertia.
 function Body:getMassData() end
 
 ---Get the position of the body.
 ---
 ---Note that this may not be the center of mass of the body.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.getPosition)
+---[Open in Browser](https://love2d.org/wiki/Body:getPosition)
 ---
----@return number, number
+---@param self love.Body
+---@return number x The x position.
+---@return number y The y position.
 function Body:getPosition() end
 
 ---Get the position and angle of the body.
 ---
 ---Note that the position may not be the center of mass of the body. An angle of 0 radians will mean 'looking to the right'. Although radians increase counter-clockwise, the y axis points down so it becomes clockwise from our point of view.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.getTransform)
+---[Open in Browser](https://love2d.org/wiki/Body:getTransform)
 ---
----@return number, number, number
+---@param self love.Body
+---@return number x The x component of the position.
+---@return number y The y component of the position.
+---@return number angle The angle in radians.
 function Body:getTransform() end
 
 ---Returns the type of the body.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.getType)
+---[Open in Browser](https://love2d.org/wiki/Body:getType)
 ---
----@return love.BodyType
+---@param self love.Body
+---@return love.BodyType type The body type.
 function Body:getType() end
 
 ---Returns the Lua value associated with this Body.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.getUserData)
+---[Open in Browser](https://love2d.org/wiki/Body:getUserData)
 ---
----@return any
+---@param self love.Body
+---@return any value The Lua value associated with the Body.
 function Body:getUserData() end
 
 ---Gets the World the body lives in.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.getWorld)
+---[Open in Browser](https://love2d.org/wiki/Body:getWorld)
 ---
----@return love.World
+---@param self love.Body
+---@return love.World world The world the body lives in.
 function Body:getWorld() end
 
 ---Get the center of mass position in world coordinates.
 ---
 ---Use Body:getLocalCenter to get the center of mass in local coordinates.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.getWorldCenter)
+---[Open in Browser](https://love2d.org/wiki/Body:getWorldCenter)
 ---
----@return number, number
+---@param self love.Body
+---@return number x The x coordinate of the center of mass.
+---@return number y The y coordinate of the center of mass.
 function Body:getWorldCenter() end
 
 ---Transform a point from local coordinates to world coordinates.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.getWorldPoint)
+---[Open in Browser](https://love2d.org/wiki/Body:getWorldPoint)
 ---
----@param localX number # The x position in local coordinates.
----@param localY number # The y position in local coordinates.
----@return number, number
+---@param self love.Body
+---@param localX number The x position in local coordinates.
+---@param localY number The y position in local coordinates.
+---@return number worldX The x position in world coordinates.
+---@return number worldY The y position in world coordinates.
 function Body:getWorldPoint(localX, localY) end
 
 ---Transforms multiple points from local coordinates to world coordinates.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.getWorldPoints)
+---[Open in Browser](https://love2d.org/wiki/Body:getWorldPoints)
 ---
----@param x1 number # The x position of the first point.
----@param y1 number # The y position of the first point.
----@param x2 number # The x position of the second point.
----@param y2 number # The y position of the second point.
----@return number, number, number, number
+---@param self love.Body
+---@param x1 number The x position of the first point.
+---@param y1 number The y position of the first point.
+---@param x2 number The x position of the second point.
+---@param y2 number The y position of the second point.
+---@return number x1 The transformed x position of the first point.
+---@return number y1 The transformed y position of the first point.
+---@return number x2 The transformed x position of the second point.
+---@return number y2 The transformed y position of the second point.
 function Body:getWorldPoints(x1, y1, x2, y2) end
 
 ---Transform a vector from local coordinates to world coordinates.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.getWorldVector)
+---[Open in Browser](https://love2d.org/wiki/Body:getWorldVector)
 ---
----@param localX number # The vector x component in local coordinates.
----@param localY number # The vector y component in local coordinates.
----@return number, number
+---@param self love.Body
+---@param localX number The vector x component in local coordinates.
+---@param localY number The vector y component in local coordinates.
+---@return number worldX The vector x component in world coordinates.
+---@return number worldY The vector y component in world coordinates.
 function Body:getWorldVector(localX, localY) end
 
 ---Get the x position of the body in world coordinates.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.getX)
+---[Open in Browser](https://love2d.org/wiki/Body:getX)
 ---
----@return number
+---@param self love.Body
+---@return number x The x position in world coordinates.
 function Body:getX() end
 
 ---Get the y position of the body in world coordinates.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.getY)
+---[Open in Browser](https://love2d.org/wiki/Body:getY)
 ---
----@return number
+---@param self love.Body
+---@return number y The y position in world coordinates.
 function Body:getY() end
 
 ---Returns whether the body is actively used in the simulation.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.isActive)
+---[Open in Browser](https://love2d.org/wiki/Body:isActive)
 ---
----@return boolean
+---@param self love.Body
+---@return boolean status True if the body is active or false if not.
 function Body:isActive() end
 
 ---Returns the sleep status of the body.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.isAwake)
+---[Open in Browser](https://love2d.org/wiki/Body:isAwake)
 ---
----@return boolean
+---@param self love.Body
+---@return boolean status True if the body is awake or false if not.
 function Body:isAwake() end
 
 ---Get the bullet status of a body.
@@ -376,53 +437,60 @@ function Body:isAwake() end
 ---
 ---Note that static bodies (with zero mass) always use CCD, so your walls will not let a fast moving body pass through even if it is not a bullet.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.isBullet)
+---[Open in Browser](https://love2d.org/wiki/Body:isBullet)
 ---
----@return boolean
+---@param self love.Body
+---@return boolean status The bullet status of the body.
 function Body:isBullet() end
 
 ---Gets whether the Body is destroyed. Destroyed bodies cannot be used.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.isDestroyed)
+---[Open in Browser](https://love2d.org/wiki/Body:isDestroyed)
 ---
----@return boolean
+---@param self love.Body
+---@return boolean destroyed Whether the Body is destroyed.
 function Body:isDestroyed() end
 
 ---Returns whether the body rotation is locked.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.isFixedRotation)
+---[Open in Browser](https://love2d.org/wiki/Body:isFixedRotation)
 ---
----@return boolean
+---@param self love.Body
+---@return boolean fixed True if the body's rotation is locked or false if not.
 function Body:isFixedRotation() end
 
 ---Returns the sleeping behaviour of the body.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.isSleepingAllowed)
+---[Open in Browser](https://love2d.org/wiki/Body:isSleepingAllowed)
 ---
----@return boolean
+---@param self love.Body
+---@return boolean allowed True if the body is allowed to sleep or false if not.
 function Body:isSleepingAllowed() end
 
 ---Gets whether the Body is touching the given other Body.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.isTouching)
+---[Open in Browser](https://love2d.org/wiki/Body:isTouching)
 ---
----@param otherbody love.Body # The other body to check.
----@return boolean
+---@param self love.Body
+---@param otherbody love.Body The other body to check.
+---@return boolean touching True if this body is touching the other body, false otherwise.
 function Body:isTouching(otherbody) end
 
 ---Resets the mass of the body by recalculating it from the mass properties of the fixtures.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.resetMassData)
+---[Open in Browser](https://love2d.org/wiki/Body:resetMassData)
 ---
+---@param self love.Body
 function Body:resetMassData() end
 
 ---Sets whether the body is active in the world.
 ---
 ---An inactive body does not take part in the simulation. It will not move or cause any collisions.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.setActive)
+---[Open in Browser](https://love2d.org/wiki/Body:setActive)
 ---
----@param active boolean # If the body is active or not.
+---@param self love.Body
+---@param active boolean If the body is active or not.
 function Body:setActive(active) end
 
 ---Set the angle of the body.
@@ -433,9 +501,10 @@ function Body:setActive(active) end
 ---
 ---It is possible to cause a collision with another body by changing its angle. 
 ---
----[Open in Browser](https://love2d.org/wiki/Body.setAngle)
+---[Open in Browser](https://love2d.org/wiki/Body:setAngle)
 ---
----@param angle number # The angle in radians.
+---@param self love.Body
+---@param angle number The angle in radians.
 function Body:setAngle(angle) end
 
 ---Sets the angular damping of a Body
@@ -444,9 +513,10 @@ function Body:setAngle(angle) end
 ---
 ---Angular damping can take any value from 0 to infinity. It is recommended to stay between 0 and 0.1, though. Other values will look unrealistic.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.setAngularDamping)
+---[Open in Browser](https://love2d.org/wiki/Body:setAngularDamping)
 ---
----@param damping number # The new angular damping.
+---@param self love.Body
+---@param damping number The new angular damping.
 function Body:setAngularDamping(damping) end
 
 ---Sets the angular velocity of a Body.
@@ -455,16 +525,18 @@ function Body:setAngularDamping(damping) end
 ---
 ---This function will not accumulate anything; any impulses previously applied since the last call to World:update will be lost. 
 ---
----[Open in Browser](https://love2d.org/wiki/Body.setAngularVelocity)
+---[Open in Browser](https://love2d.org/wiki/Body:setAngularVelocity)
 ---
----@param w number # The new angular velocity, in radians per second
+---@param self love.Body
+---@param w number The new angular velocity, in radians per second
 function Body:setAngularVelocity(w) end
 
 ---Wakes the body up or puts it to sleep.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.setAwake)
+---[Open in Browser](https://love2d.org/wiki/Body:setAwake)
 ---
----@param awake boolean # The body sleep status.
+---@param self love.Body
+---@param awake boolean The body sleep status.
 function Body:setAwake(awake) end
 
 ---Set the bullet status of a body.
@@ -479,32 +551,36 @@ function Body:setAwake(awake) end
 ---
 ---Note that static bodies (with zero mass) always use CCD, so your walls will not let a fast moving body pass through even if it is not a bullet.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.setBullet)
+---[Open in Browser](https://love2d.org/wiki/Body:setBullet)
 ---
----@param status boolean # The bullet status of the body.
+---@param self love.Body
+---@param status boolean The bullet status of the body.
 function Body:setBullet(status) end
 
 ---Set whether a body has fixed rotation.
 ---
 ---Bodies with fixed rotation don't vary the speed at which they rotate. Calling this function causes the mass to be reset. 
 ---
----[Open in Browser](https://love2d.org/wiki/Body.setFixedRotation)
+---[Open in Browser](https://love2d.org/wiki/Body:setFixedRotation)
 ---
----@param isFixed boolean # Whether the body should have fixed rotation.
+---@param self love.Body
+---@param isFixed boolean Whether the body should have fixed rotation.
 function Body:setFixedRotation(isFixed) end
 
 ---Sets a new gravity scale factor for the body.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.setGravityScale)
+---[Open in Browser](https://love2d.org/wiki/Body:setGravityScale)
 ---
----@param scale number # The new gravity scale factor.
+---@param self love.Body
+---@param scale number The new gravity scale factor.
 function Body:setGravityScale(scale) end
 
 ---Set the inertia of a body.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.setInertia)
+---[Open in Browser](https://love2d.org/wiki/Body:setInertia)
 ---
----@param inertia number # The new moment of inertia, in kilograms * pixel squared.
+---@param self love.Body
+---@param inertia number The new moment of inertia, in kilograms * pixel squared.
 function Body:setInertia(inertia) end
 
 ---Sets the linear damping of a Body
@@ -513,36 +589,40 @@ function Body:setInertia(inertia) end
 ---
 ---Linear damping can take any value from 0 to infinity. It is recommended to stay between 0 and 0.1, though. Other values will make the objects look 'floaty'(if gravity is enabled).
 ---
----[Open in Browser](https://love2d.org/wiki/Body.setLinearDamping)
+---[Open in Browser](https://love2d.org/wiki/Body:setLinearDamping)
 ---
----@param ld number # The new linear damping
+---@param self love.Body
+---@param ld number The new linear damping
 function Body:setLinearDamping(ld) end
 
 ---Sets a new linear velocity for the Body.
 ---
 ---This function will not accumulate anything; any impulses previously applied since the last call to World:update will be lost.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.setLinearVelocity)
+---[Open in Browser](https://love2d.org/wiki/Body:setLinearVelocity)
 ---
----@param x number # The x-component of the velocity vector.
----@param y number # The y-component of the velocity vector.
+---@param self love.Body
+---@param x number The x-component of the velocity vector.
+---@param y number The y-component of the velocity vector.
 function Body:setLinearVelocity(x, y) end
 
 ---Sets a new body mass.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.setMass)
+---[Open in Browser](https://love2d.org/wiki/Body:setMass)
 ---
----@param mass number # The mass, in kilograms.
+---@param self love.Body
+---@param mass number The mass, in kilograms.
 function Body:setMass(mass) end
 
 ---Overrides the calculated mass data.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.setMassData)
+---[Open in Browser](https://love2d.org/wiki/Body:setMassData)
 ---
----@param x number # The x position of the center of mass.
----@param y number # The y position of the center of mass.
----@param mass number # The mass of the body.
----@param inertia number # The rotational inertia.
+---@param self love.Body
+---@param x number The x position of the center of mass.
+---@param y number The y position of the center of mass.
+---@param mass number The mass of the body.
+---@param inertia number The rotational inertia.
 function Body:setMassData(x, y, mass, inertia) end
 
 ---Set the position of the body.
@@ -551,17 +631,19 @@ function Body:setMassData(x, y, mass, inertia) end
 ---
 ---This function cannot wake up the body.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.setPosition)
+---[Open in Browser](https://love2d.org/wiki/Body:setPosition)
 ---
----@param x number # The x position.
----@param y number # The y position.
+---@param self love.Body
+---@param x number The x position.
+---@param y number The y position.
 function Body:setPosition(x, y) end
 
 ---Sets the sleeping behaviour of the body. Should sleeping be allowed, a body at rest will automatically sleep. A sleeping body is not simulated unless it collided with an awake body. Be wary that one can end up with a situation like a floating sleeping body if the floor was removed.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.setSleepingAllowed)
+---[Open in Browser](https://love2d.org/wiki/Body:setSleepingAllowed)
 ---
----@param allowed boolean # True if the body is allowed to sleep or false if not.
+---@param self love.Body
+---@param allowed boolean True if the body is allowed to sleep or false if not.
 function Body:setSleepingAllowed(allowed) end
 
 ---Set the position and angle of the body.
@@ -570,50 +652,55 @@ function Body:setSleepingAllowed(allowed) end
 ---
 ---This function cannot wake up the body.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.setTransform)
+---[Open in Browser](https://love2d.org/wiki/Body:setTransform)
 ---
----@param x number # The x component of the position.
----@param y number # The y component of the position.
----@param angle number # The angle in radians.
+---@param self love.Body
+---@param x number The x component of the position.
+---@param y number The y component of the position.
+---@param angle number The angle in radians.
 function Body:setTransform(x, y, angle) end
 
 ---Sets a new body type.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.setType)
+---[Open in Browser](https://love2d.org/wiki/Body:setType)
 ---
----@param type love.BodyType # The new type.
+---@param self love.Body
+---@param type love.BodyType The new type.
 function Body:setType(type) end
 
 ---Associates a Lua value with the Body.
 ---
 ---To delete the reference, explicitly pass nil.
 ---
----[Open in Browser](https://love2d.org/wiki/Body.setUserData)
+---[Open in Browser](https://love2d.org/wiki/Body:setUserData)
 ---
----@param value any # The Lua value to associate with the Body.
+---@param self love.Body
+---@param value any The Lua value to associate with the Body.
 function Body:setUserData(value) end
 
 ---Set the x position of the body.
 ---
 ---This function cannot wake up the body. 
 ---
----[Open in Browser](https://love2d.org/wiki/Body.setX)
+---[Open in Browser](https://love2d.org/wiki/Body:setX)
 ---
----@param x number # The x position.
+---@param self love.Body
+---@param x number The x position.
 function Body:setX(x) end
 
 ---Set the y position of the body.
 ---
 ---This function cannot wake up the body. 
 ---
----[Open in Browser](https://love2d.org/wiki/Body.setY)
+---[Open in Browser](https://love2d.org/wiki/Body:setY)
 ---
----@param y number # The y position.
+---@param self love.Body
+---@param y number The y position.
 function Body:setY(y) end
 
---endregion Body
+--endregion love.Body
 
---region ChainShape
+--region love.ChainShape
 
 ---A ChainShape consists of multiple line segments. It can be used to create the boundaries of your terrain. The shape does not have volume and can only collide with PolygonShape and CircleShape.
 ---
@@ -621,441 +708,524 @@ function Body:setY(y) end
 ---
 ---[Open in Browser](https://love2d.org/wiki/ChainShape)
 ---
----@class ChainShape : Shape, Object
+---@class love.ChainShape : love.Shape, love.Object
 local ChainShape = {}
+
 ---Returns a child of the shape as an EdgeShape.
 ---
----[Open in Browser](https://love2d.org/wiki/ChainShape.getChildEdge)
+---[Open in Browser](https://love2d.org/wiki/ChainShape:getChildEdge)
 ---
----@param index number # The index of the child.
----@return love.EdgeShape
+---@param self love.ChainShape
+---@param index number The index of the child.
+---@return love.EdgeShape shape The child as an EdgeShape.
 function ChainShape:getChildEdge(index) end
 
 ---Gets the vertex that establishes a connection to the next shape.
 ---
 ---Setting next and previous ChainShape vertices can help prevent unwanted collisions when a flat shape slides along the edge and moves over to the new shape.
 ---
----[Open in Browser](https://love2d.org/wiki/ChainShape.getNextVertex)
+---[Open in Browser](https://love2d.org/wiki/ChainShape:getNextVertex)
 ---
----@return number, number
+---@param self love.ChainShape
+---@return number x The x-component of the vertex, or nil if ChainShape:setNextVertex hasn't been called.
+---@return number y The y-component of the vertex, or nil if ChainShape:setNextVertex hasn't been called.
 function ChainShape:getNextVertex() end
 
 ---Returns a point of the shape.
 ---
----[Open in Browser](https://love2d.org/wiki/ChainShape.getPoint)
+---[Open in Browser](https://love2d.org/wiki/ChainShape:getPoint)
 ---
----@param index number # The index of the point to return.
----@return number, number
+---@param self love.ChainShape
+---@param index number The index of the point to return.
+---@return number x The x-coordinate of the point.
+---@return number y The y-coordinate of the point.
 function ChainShape:getPoint(index) end
 
 ---Returns all points of the shape.
 ---
----[Open in Browser](https://love2d.org/wiki/ChainShape.getPoints)
+---[Open in Browser](https://love2d.org/wiki/ChainShape:getPoints)
 ---
----@return number, number, number, number
+---@param self love.ChainShape
+---@return number x1 The x-coordinate of the first point.
+---@return number y1 The y-coordinate of the first point.
+---@return number x2 The x-coordinate of the second point.
+---@return number y2 The y-coordinate of the second point.
 function ChainShape:getPoints() end
 
 ---Gets the vertex that establishes a connection to the previous shape.
 ---
 ---Setting next and previous ChainShape vertices can help prevent unwanted collisions when a flat shape slides along the edge and moves over to the new shape.
 ---
----[Open in Browser](https://love2d.org/wiki/ChainShape.getPreviousVertex)
+---[Open in Browser](https://love2d.org/wiki/ChainShape:getPreviousVertex)
 ---
----@return number, number
+---@param self love.ChainShape
+---@return number x The x-component of the vertex, or nil if ChainShape:setPreviousVertex hasn't been called.
+---@return number y The y-component of the vertex, or nil if ChainShape:setPreviousVertex hasn't been called.
 function ChainShape:getPreviousVertex() end
 
 ---Returns the number of vertices the shape has.
 ---
----[Open in Browser](https://love2d.org/wiki/ChainShape.getVertexCount)
+---[Open in Browser](https://love2d.org/wiki/ChainShape:getVertexCount)
 ---
----@return number
+---@param self love.ChainShape
+---@return number count The number of vertices.
 function ChainShape:getVertexCount() end
 
 ---Sets a vertex that establishes a connection to the next shape.
 ---
 ---This can help prevent unwanted collisions when a flat shape slides along the edge and moves over to the new shape.
 ---
----[Open in Browser](https://love2d.org/wiki/ChainShape.setNextVertex)
+---[Open in Browser](https://love2d.org/wiki/ChainShape:setNextVertex)
 ---
----@param x number # The x-component of the vertex.
----@param y number # The y-component of the vertex.
+---@param self love.ChainShape
+---@param x number The x-component of the vertex.
+---@param y number The y-component of the vertex.
 function ChainShape:setNextVertex(x, y) end
 
 ---Sets a vertex that establishes a connection to the previous shape.
 ---
 ---This can help prevent unwanted collisions when a flat shape slides along the edge and moves over to the new shape.
 ---
----[Open in Browser](https://love2d.org/wiki/ChainShape.setPreviousVertex)
+---[Open in Browser](https://love2d.org/wiki/ChainShape:setPreviousVertex)
 ---
----@param x number # The x-component of the vertex.
----@param y number # The y-component of the vertex.
+---@param self love.ChainShape
+---@param x number The x-component of the vertex.
+---@param y number The y-component of the vertex.
 function ChainShape:setPreviousVertex(x, y) end
 
---endregion ChainShape
+--endregion love.ChainShape
 
---region CircleShape
+--region love.CircleShape
 
 ---Circle extends Shape and adds a radius and a local position.
 ---
 ---[Open in Browser](https://love2d.org/wiki/CircleShape)
 ---
----@class CircleShape : Shape, Object
+---@class love.CircleShape : love.Shape, love.Object
 local CircleShape = {}
+
 ---Gets the center point of the circle shape.
 ---
----[Open in Browser](https://love2d.org/wiki/CircleShape.getPoint)
+---[Open in Browser](https://love2d.org/wiki/CircleShape:getPoint)
 ---
----@return number, number
+---@param self love.CircleShape
+---@return number x The x-component of the center point of the circle.
+---@return number y The y-component of the center point of the circle.
 function CircleShape:getPoint() end
 
 ---Gets the radius of the circle shape.
 ---
----[Open in Browser](https://love2d.org/wiki/CircleShape.getRadius)
+---[Open in Browser](https://love2d.org/wiki/CircleShape:getRadius)
 ---
----@return number
+---@param self love.CircleShape
+---@return number radius The radius of the circle
 function CircleShape:getRadius() end
 
 ---Sets the location of the center of the circle shape.
 ---
----[Open in Browser](https://love2d.org/wiki/CircleShape.setPoint)
+---[Open in Browser](https://love2d.org/wiki/CircleShape:setPoint)
 ---
----@param x number # The x-component of the new center point of the circle.
----@param y number # The y-component of the new center point of the circle.
+---@param self love.CircleShape
+---@param x number The x-component of the new center point of the circle.
+---@param y number The y-component of the new center point of the circle.
 function CircleShape:setPoint(x, y) end
 
 ---Sets the radius of the circle.
 ---
----[Open in Browser](https://love2d.org/wiki/CircleShape.setRadius)
+---[Open in Browser](https://love2d.org/wiki/CircleShape:setRadius)
 ---
----@param radius number # The radius of the circle
+---@param self love.CircleShape
+---@param radius number The radius of the circle
 function CircleShape:setRadius(radius) end
 
---endregion CircleShape
+--endregion love.CircleShape
 
---region Contact
+--region love.Contact
 
 ---Contacts are objects created to manage collisions in worlds.
 ---
 ---[Open in Browser](https://love2d.org/wiki/Contact)
 ---
----@class Contact : Object
+---@class love.Contact : love.Object
 local Contact = {}
+
 ---Gets the child indices of the shapes of the two colliding fixtures. For ChainShapes, an index of 1 is the first edge in the chain.
 ---Used together with Fixture:rayCast or ChainShape:getChildEdge.
 ---
----[Open in Browser](https://love2d.org/wiki/Contact.getChildren)
+---[Open in Browser](https://love2d.org/wiki/Contact:getChildren)
 ---
----@return number, number
+---@param self love.Contact
+---@return number indexA The child index of the first fixture's shape.
+---@return number indexB The child index of the second fixture's shape.
 function Contact:getChildren() end
 
 ---Gets the two Fixtures that hold the shapes that are in contact.
 ---
----[Open in Browser](https://love2d.org/wiki/Contact.getFixtures)
+---[Open in Browser](https://love2d.org/wiki/Contact:getFixtures)
 ---
----@return love.Fixture, love.Fixture
+---@param self love.Contact
+---@return love.Fixture fixtureA The first Fixture.
+---@return love.Fixture fixtureB The second Fixture.
 function Contact:getFixtures() end
 
 ---Get the friction between two shapes that are in contact.
 ---
----[Open in Browser](https://love2d.org/wiki/Contact.getFriction)
+---[Open in Browser](https://love2d.org/wiki/Contact:getFriction)
 ---
----@return number
+---@param self love.Contact
+---@return number friction The friction of the contact.
 function Contact:getFriction() end
 
 ---Get the normal vector between two shapes that are in contact.
 ---
 ---This function returns the coordinates of a unit vector that points from the first shape to the second.
 ---
----[Open in Browser](https://love2d.org/wiki/Contact.getNormal)
+---[Open in Browser](https://love2d.org/wiki/Contact:getNormal)
 ---
----@return number, number
+---@param self love.Contact
+---@return number nx The x component of the normal vector.
+---@return number ny The y component of the normal vector.
 function Contact:getNormal() end
 
 ---Returns the contact points of the two colliding fixtures. There can be one or two points.
 ---
----[Open in Browser](https://love2d.org/wiki/Contact.getPositions)
+---[Open in Browser](https://love2d.org/wiki/Contact:getPositions)
 ---
----@return number, number, number, number
+---@param self love.Contact
+---@return number x1 The x coordinate of the first contact point.
+---@return number y1 The y coordinate of the first contact point.
+---@return number x2 The x coordinate of the second contact point.
+---@return number y2 The y coordinate of the second contact point.
 function Contact:getPositions() end
 
 ---Get the restitution between two shapes that are in contact.
 ---
----[Open in Browser](https://love2d.org/wiki/Contact.getRestitution)
+---[Open in Browser](https://love2d.org/wiki/Contact:getRestitution)
 ---
----@return number
+---@param self love.Contact
+---@return number restitution The restitution between the two shapes.
 function Contact:getRestitution() end
 
 ---Returns whether the contact is enabled. The collision will be ignored if a contact gets disabled in the preSolve callback.
 ---
----[Open in Browser](https://love2d.org/wiki/Contact.isEnabled)
+---[Open in Browser](https://love2d.org/wiki/Contact:isEnabled)
 ---
----@return boolean
+---@param self love.Contact
+---@return boolean enabled True if enabled, false otherwise.
 function Contact:isEnabled() end
 
 ---Returns whether the two colliding fixtures are touching each other.
 ---
----[Open in Browser](https://love2d.org/wiki/Contact.isTouching)
+---[Open in Browser](https://love2d.org/wiki/Contact:isTouching)
 ---
----@return boolean
+---@param self love.Contact
+---@return boolean touching True if they touch or false if not.
 function Contact:isTouching() end
 
 ---Resets the contact friction to the mixture value of both fixtures.
 ---
----[Open in Browser](https://love2d.org/wiki/Contact.resetFriction)
+---[Open in Browser](https://love2d.org/wiki/Contact:resetFriction)
 ---
+---@param self love.Contact
 function Contact:resetFriction() end
 
 ---Resets the contact restitution to the mixture value of both fixtures.
 ---
----[Open in Browser](https://love2d.org/wiki/Contact.resetRestitution)
+---[Open in Browser](https://love2d.org/wiki/Contact:resetRestitution)
 ---
+---@param self love.Contact
 function Contact:resetRestitution() end
 
 ---Enables or disables the contact.
 ---
----[Open in Browser](https://love2d.org/wiki/Contact.setEnabled)
+---[Open in Browser](https://love2d.org/wiki/Contact:setEnabled)
 ---
----@param enabled boolean # True to enable or false to disable.
+---@param self love.Contact
+---@param enabled boolean True to enable or false to disable.
 function Contact:setEnabled(enabled) end
 
 ---Sets the contact friction.
 ---
----[Open in Browser](https://love2d.org/wiki/Contact.setFriction)
+---[Open in Browser](https://love2d.org/wiki/Contact:setFriction)
 ---
----@param friction number # The contact friction.
+---@param self love.Contact
+---@param friction number The contact friction.
 function Contact:setFriction(friction) end
 
 ---Sets the contact restitution.
 ---
----[Open in Browser](https://love2d.org/wiki/Contact.setRestitution)
+---[Open in Browser](https://love2d.org/wiki/Contact:setRestitution)
 ---
----@param restitution number # The contact restitution.
+---@param self love.Contact
+---@param restitution number The contact restitution.
 function Contact:setRestitution(restitution) end
 
---endregion Contact
+--endregion love.Contact
 
---region DistanceJoint
+--region love.DistanceJoint
 
 ---Keeps two bodies at the same distance.
 ---
 ---[Open in Browser](https://love2d.org/wiki/DistanceJoint)
 ---
----@class DistanceJoint : Joint, Object
+---@class love.DistanceJoint : love.Joint, love.Object
 local DistanceJoint = {}
+
 ---Gets the damping ratio.
 ---
----[Open in Browser](https://love2d.org/wiki/DistanceJoint.getDampingRatio)
+---[Open in Browser](https://love2d.org/wiki/DistanceJoint:getDampingRatio)
 ---
----@return number
+---@param self love.DistanceJoint
+---@return number ratio The damping ratio.
 function DistanceJoint:getDampingRatio() end
 
 ---Gets the response speed.
 ---
----[Open in Browser](https://love2d.org/wiki/DistanceJoint.getFrequency)
+---[Open in Browser](https://love2d.org/wiki/DistanceJoint:getFrequency)
 ---
----@return number
+---@param self love.DistanceJoint
+---@return number Hz The response speed.
 function DistanceJoint:getFrequency() end
 
 ---Gets the equilibrium distance between the two Bodies.
 ---
----[Open in Browser](https://love2d.org/wiki/DistanceJoint.getLength)
+---[Open in Browser](https://love2d.org/wiki/DistanceJoint:getLength)
 ---
----@return number
+---@param self love.DistanceJoint
+---@return number l The length between the two Bodies.
 function DistanceJoint:getLength() end
 
 ---Sets the damping ratio.
 ---
----[Open in Browser](https://love2d.org/wiki/DistanceJoint.setDampingRatio)
+---[Open in Browser](https://love2d.org/wiki/DistanceJoint:setDampingRatio)
 ---
----@param ratio number # The damping ratio.
+---@param self love.DistanceJoint
+---@param ratio number The damping ratio.
 function DistanceJoint:setDampingRatio(ratio) end
 
 ---Sets the response speed.
 ---
----[Open in Browser](https://love2d.org/wiki/DistanceJoint.setFrequency)
+---[Open in Browser](https://love2d.org/wiki/DistanceJoint:setFrequency)
 ---
----@param Hz number # The response speed.
+---@param self love.DistanceJoint
+---@param Hz number The response speed.
 function DistanceJoint:setFrequency(Hz) end
 
 ---Sets the equilibrium distance between the two Bodies.
 ---
----[Open in Browser](https://love2d.org/wiki/DistanceJoint.setLength)
+---[Open in Browser](https://love2d.org/wiki/DistanceJoint:setLength)
 ---
----@param l number # The length between the two Bodies.
+---@param self love.DistanceJoint
+---@param l number The length between the two Bodies.
 function DistanceJoint:setLength(l) end
 
---endregion DistanceJoint
+--endregion love.DistanceJoint
 
---region EdgeShape
+--region love.EdgeShape
 
 ---A EdgeShape is a line segment. They can be used to create the boundaries of your terrain. The shape does not have volume and can only collide with PolygonShape and CircleShape.
 ---
 ---[Open in Browser](https://love2d.org/wiki/EdgeShape)
 ---
----@class EdgeShape : Shape, Object
+---@class love.EdgeShape : love.Shape, love.Object
 local EdgeShape = {}
+
 ---Gets the vertex that establishes a connection to the next shape.
 ---
 ---Setting next and previous EdgeShape vertices can help prevent unwanted collisions when a flat shape slides along the edge and moves over to the new shape.
 ---
----[Open in Browser](https://love2d.org/wiki/EdgeShape.getNextVertex)
+---[Open in Browser](https://love2d.org/wiki/EdgeShape:getNextVertex)
 ---
----@return number, number
+---@param self love.EdgeShape
+---@return number x The x-component of the vertex, or nil if EdgeShape:setNextVertex hasn't been called.
+---@return number y The y-component of the vertex, or nil if EdgeShape:setNextVertex hasn't been called.
 function EdgeShape:getNextVertex() end
 
 ---Returns the local coordinates of the edge points.
 ---
----[Open in Browser](https://love2d.org/wiki/EdgeShape.getPoints)
+---[Open in Browser](https://love2d.org/wiki/EdgeShape:getPoints)
 ---
----@return number, number, number, number
+---@param self love.EdgeShape
+---@return number x1 The x-component of the first vertex.
+---@return number y1 The y-component of the first vertex.
+---@return number x2 The x-component of the second vertex.
+---@return number y2 The y-component of the second vertex.
 function EdgeShape:getPoints() end
 
 ---Gets the vertex that establishes a connection to the previous shape.
 ---
 ---Setting next and previous EdgeShape vertices can help prevent unwanted collisions when a flat shape slides along the edge and moves over to the new shape.
 ---
----[Open in Browser](https://love2d.org/wiki/EdgeShape.getPreviousVertex)
+---[Open in Browser](https://love2d.org/wiki/EdgeShape:getPreviousVertex)
 ---
----@return number, number
+---@param self love.EdgeShape
+---@return number x The x-component of the vertex, or nil if EdgeShape:setPreviousVertex hasn't been called.
+---@return number y The y-component of the vertex, or nil if EdgeShape:setPreviousVertex hasn't been called.
 function EdgeShape:getPreviousVertex() end
 
 ---Sets a vertex that establishes a connection to the next shape.
 ---
 ---This can help prevent unwanted collisions when a flat shape slides along the edge and moves over to the new shape.
 ---
----[Open in Browser](https://love2d.org/wiki/EdgeShape.setNextVertex)
+---[Open in Browser](https://love2d.org/wiki/EdgeShape:setNextVertex)
 ---
----@param x number # The x-component of the vertex.
----@param y number # The y-component of the vertex.
+---@param self love.EdgeShape
+---@param x number The x-component of the vertex.
+---@param y number The y-component of the vertex.
 function EdgeShape:setNextVertex(x, y) end
 
 ---Sets a vertex that establishes a connection to the previous shape.
 ---
 ---This can help prevent unwanted collisions when a flat shape slides along the edge and moves over to the new shape.
 ---
----[Open in Browser](https://love2d.org/wiki/EdgeShape.setPreviousVertex)
+---[Open in Browser](https://love2d.org/wiki/EdgeShape:setPreviousVertex)
 ---
----@param x number # The x-component of the vertex.
----@param y number # The y-component of the vertex.
+---@param self love.EdgeShape
+---@param x number The x-component of the vertex.
+---@param y number The y-component of the vertex.
 function EdgeShape:setPreviousVertex(x, y) end
 
---endregion EdgeShape
+--endregion love.EdgeShape
 
---region Fixture
+--region love.Fixture
 
 ---Fixtures attach shapes to bodies.
 ---
 ---[Open in Browser](https://love2d.org/wiki/Fixture)
 ---
----@class Fixture : Object
+---@class love.Fixture : love.Object
 local Fixture = {}
+
 ---Destroys the fixture.
 ---
----[Open in Browser](https://love2d.org/wiki/Fixture.destroy)
+---[Open in Browser](https://love2d.org/wiki/Fixture:destroy)
 ---
+---@param self love.Fixture
 function Fixture:destroy() end
 
 ---Returns the body to which the fixture is attached.
 ---
----[Open in Browser](https://love2d.org/wiki/Fixture.getBody)
+---[Open in Browser](https://love2d.org/wiki/Fixture:getBody)
 ---
----@return love.Body
+---@param self love.Fixture
+---@return love.Body body The parent body.
 function Fixture:getBody() end
 
 ---Returns the points of the fixture bounding box. In case the fixture has multiple children a 1-based index can be specified. For example, a fixture will have multiple children with a chain shape.
 ---
----[Open in Browser](https://love2d.org/wiki/Fixture.getBoundingBox)
+---[Open in Browser](https://love2d.org/wiki/Fixture:getBoundingBox)
 ---
----@param index number? # A bounding box of the fixture. (Defaults to 1.)
----@return number, number, number, number
+---@param self love.Fixture
+---@param index number A bounding box of the fixture. (defaults to `1`.)
+---@return number topLeftX The x position of the top-left point.
+---@return number topLeftY The y position of the top-left point.
+---@return number bottomRightX The x position of the bottom-right point.
+---@return number bottomRightY The y position of the bottom-right point.
 function Fixture:getBoundingBox(index) end
 
 ---Returns the categories the fixture belongs to.
 ---
----[Open in Browser](https://love2d.org/wiki/Fixture.getCategory)
+---[Open in Browser](https://love2d.org/wiki/Fixture:getCategory)
 ---
----@return number
+---@param self love.Fixture
+---@return number The categories.
 function Fixture:getCategory() end
 
 ---Returns the density of the fixture.
 ---
----[Open in Browser](https://love2d.org/wiki/Fixture.getDensity)
+---[Open in Browser](https://love2d.org/wiki/Fixture:getDensity)
 ---
----@return number
+---@param self love.Fixture
+---@return number density The fixture density in kilograms per square meter.
 function Fixture:getDensity() end
 
 ---Returns the filter data of the fixture.
 ---
 ---Categories and masks are encoded as the bits of a 16-bit integer.
 ---
----[Open in Browser](https://love2d.org/wiki/Fixture.getFilterData)
+---[Open in Browser](https://love2d.org/wiki/Fixture:getFilterData)
 ---
----@return number, number, number
+---@param self love.Fixture
+---@return number categories The categories as an integer from 0 to 65535.
+---@return number mask The mask as an integer from 0 to 65535.
+---@return number group The group as an integer from -32768 to 32767.
 function Fixture:getFilterData() end
 
 ---Returns the friction of the fixture.
 ---
----[Open in Browser](https://love2d.org/wiki/Fixture.getFriction)
+---[Open in Browser](https://love2d.org/wiki/Fixture:getFriction)
 ---
----@return number
+---@param self love.Fixture
+---@return number friction The fixture friction.
 function Fixture:getFriction() end
 
 ---Returns the group the fixture belongs to. Fixtures with the same group will always collide if the group is positive or never collide if it's negative. The group zero means no group.
 ---
 ---The groups range from -32768 to 32767.
 ---
----[Open in Browser](https://love2d.org/wiki/Fixture.getGroupIndex)
+---[Open in Browser](https://love2d.org/wiki/Fixture:getGroupIndex)
 ---
----@return number
+---@param self love.Fixture
+---@return number group The group of the fixture.
 function Fixture:getGroupIndex() end
 
 ---Returns which categories this fixture should '''NOT''' collide with.
 ---
----[Open in Browser](https://love2d.org/wiki/Fixture.getMask)
+---[Open in Browser](https://love2d.org/wiki/Fixture:getMask)
 ---
----@return number
+---@param self love.Fixture
+---@return number The masks.
 function Fixture:getMask() end
 
 ---Returns the mass, its center and the rotational inertia.
 ---
----[Open in Browser](https://love2d.org/wiki/Fixture.getMassData)
+---[Open in Browser](https://love2d.org/wiki/Fixture:getMassData)
 ---
----@return number, number, number, number
+---@param self love.Fixture
+---@return number x The x position of the center of mass.
+---@return number y The y position of the center of mass.
+---@return number mass The mass of the fixture.
+---@return number inertia The rotational inertia.
 function Fixture:getMassData() end
 
 ---Returns the restitution of the fixture.
 ---
----[Open in Browser](https://love2d.org/wiki/Fixture.getRestitution)
+---[Open in Browser](https://love2d.org/wiki/Fixture:getRestitution)
 ---
----@return number
+---@param self love.Fixture
+---@return number restitution The fixture restitution.
 function Fixture:getRestitution() end
 
 ---Returns the shape of the fixture. This shape is a reference to the actual data used in the simulation. It's possible to change its values between timesteps.
 ---
----[Open in Browser](https://love2d.org/wiki/Fixture.getShape)
+---[Open in Browser](https://love2d.org/wiki/Fixture:getShape)
 ---
----@return love.Shape
+---@param self love.Fixture
+---@return love.Shape shape The fixture's shape.
 function Fixture:getShape() end
 
 ---Returns the Lua value associated with this fixture.
 ---
----[Open in Browser](https://love2d.org/wiki/Fixture.getUserData)
+---[Open in Browser](https://love2d.org/wiki/Fixture:getUserData)
 ---
----@return any
+---@param self love.Fixture
+---@return any value The Lua value associated with the fixture.
 function Fixture:getUserData() end
 
 ---Gets whether the Fixture is destroyed. Destroyed fixtures cannot be used.
 ---
----[Open in Browser](https://love2d.org/wiki/Fixture.isDestroyed)
+---[Open in Browser](https://love2d.org/wiki/Fixture:isDestroyed)
 ---
----@return boolean
+---@param self love.Fixture
+---@return boolean destroyed Whether the Fixture is destroyed.
 function Fixture:isDestroyed() end
 
 ---Returns whether the fixture is a sensor.
 ---
----[Open in Browser](https://love2d.org/wiki/Fixture.isSensor)
+---[Open in Browser](https://love2d.org/wiki/Fixture:isSensor)
 ---
----@return boolean
+---@param self love.Fixture
+---@return boolean sensor If the fixture is a sensor.
 function Fixture:isSensor() end
 
 ---Casts a ray against the shape of the fixture and returns the surface normal vector and the line position where the ray hit. If the ray missed the shape, nil will be returned.
@@ -1068,31 +1238,35 @@ function Fixture:isSensor() end
 ---
 ---hitx, hity = x1 + (x2 - x1) * fraction, y1 + (y2 - y1) * fraction
 ---
----[Open in Browser](https://love2d.org/wiki/Fixture.rayCast)
+---[Open in Browser](https://love2d.org/wiki/Fixture:rayCast)
 ---
----@param x1 number # The x position of the input line starting point.
----@param y1 number # The y position of the input line starting point.
----@param x2 number # The x position of the input line end point.
----@param y2 number # The y position of the input line end point.
----@param maxFraction number # Ray length parameter.
----@param childIndex number? # The index of the child the ray gets cast against. (Defaults to 1.)
----@return number, number, number
+---@param self love.Fixture
+---@param x1 number The x position of the input line starting point.
+---@param y1 number The y position of the input line starting point.
+---@param x2 number The x position of the input line end point.
+---@param y2 number The y position of the input line end point.
+---@param maxFraction number Ray length parameter.
+---@param childIndex number? The index of the child the ray gets cast against. (defaults to `1`.)
+---@return number xn The x component of the normal vector of the edge where the ray hit the shape.
+---@return number yn The y component of the normal vector of the edge where the ray hit the shape.
+---@return number fraction The position on the input line where the intersection happened as a factor of the line length.
 function Fixture:rayCast(x1, y1, x2, y2, maxFraction, childIndex) end
 
 ---Sets the categories the fixture belongs to. There can be up to 16 categories represented as a number from 1 to 16.
 ---
 ---All fixture's default category is 1.
 ---
----[Open in Browser](https://love2d.org/wiki/Fixture.setCategory)
+---[Open in Browser](https://love2d.org/wiki/Fixture:setCategory)
 ---
----@vararg number # The categories.
+---@param self love.Fixture
 function Fixture:setCategory(...) end
 
 ---Sets the density of the fixture. Call Body:resetMassData if this needs to take effect immediately.
 ---
----[Open in Browser](https://love2d.org/wiki/Fixture.setDensity)
+---[Open in Browser](https://love2d.org/wiki/Fixture:setDensity)
 ---
----@param density number # The fixture density in kilograms per square meter.
+---@param self love.Fixture
+---@param density number The fixture density in kilograms per square meter.
 function Fixture:setDensity(density) end
 
 ---Sets the filter data of the fixture.
@@ -1107,749 +1281,863 @@ function Fixture:setDensity(density) end
 ---
 ---This function allows setting all filter data for a fixture at once. To set only the categories, the mask or the group, you can use Fixture:setCategory, Fixture:setMask or Fixture:setGroupIndex respectively.
 ---
----[Open in Browser](https://love2d.org/wiki/Fixture.setFilterData)
+---[Open in Browser](https://love2d.org/wiki/Fixture:setFilterData)
 ---
----@param categories number # The categories as an integer from 0 to 65535.
----@param mask number # The mask as an integer from 0 to 65535.
----@param group number # The group as an integer from -32768 to 32767.
+---@param self love.Fixture
+---@param categories number The categories as an integer from 0 to 65535.
+---@param mask number The mask as an integer from 0 to 65535.
+---@param group number The group as an integer from -32768 to 32767.
 function Fixture:setFilterData(categories, mask, group) end
 
 ---Sets the friction of the fixture.
 ---
 ---Friction determines how shapes react when they 'slide' along other shapes. Low friction indicates a slippery surface, like ice, while high friction indicates a rough surface, like concrete. Range: 0.0 - 1.0.
 ---
----[Open in Browser](https://love2d.org/wiki/Fixture.setFriction)
+---[Open in Browser](https://love2d.org/wiki/Fixture:setFriction)
 ---
----@param friction number # The fixture friction.
+---@param self love.Fixture
+---@param friction number The fixture friction.
 function Fixture:setFriction(friction) end
 
 ---Sets the group the fixture belongs to. Fixtures with the same group will always collide if the group is positive or never collide if it's negative. The group zero means no group.
 ---
 ---The groups range from -32768 to 32767.
 ---
----[Open in Browser](https://love2d.org/wiki/Fixture.setGroupIndex)
+---[Open in Browser](https://love2d.org/wiki/Fixture:setGroupIndex)
 ---
----@param group number # The group as an integer from -32768 to 32767.
+---@param self love.Fixture
+---@param group number The group as an integer from -32768 to 32767.
 function Fixture:setGroupIndex(group) end
 
 ---Sets the category mask of the fixture. There can be up to 16 categories represented as a number from 1 to 16.
 ---
 ---This fixture will '''NOT''' collide with the fixtures that are in the selected categories if the other fixture also has a category of this fixture selected.
 ---
----[Open in Browser](https://love2d.org/wiki/Fixture.setMask)
+---[Open in Browser](https://love2d.org/wiki/Fixture:setMask)
 ---
----@vararg number # The masks.
+---@param self love.Fixture
 function Fixture:setMask(...) end
 
 ---Sets the restitution of the fixture.
 ---
----[Open in Browser](https://love2d.org/wiki/Fixture.setRestitution)
+---[Open in Browser](https://love2d.org/wiki/Fixture:setRestitution)
 ---
----@param restitution number # The fixture restitution.
+---@param self love.Fixture
+---@param restitution number The fixture restitution.
 function Fixture:setRestitution(restitution) end
 
 ---Sets whether the fixture should act as a sensor.
 ---
 ---Sensors do not cause collision responses, but the begin-contact and end-contact World callbacks will still be called for this fixture.
 ---
----[Open in Browser](https://love2d.org/wiki/Fixture.setSensor)
+---[Open in Browser](https://love2d.org/wiki/Fixture:setSensor)
 ---
----@param sensor boolean # The sensor status.
+---@param self love.Fixture
+---@param sensor boolean The sensor status.
 function Fixture:setSensor(sensor) end
 
 ---Associates a Lua value with the fixture.
 ---
 ---To delete the reference, explicitly pass nil.
 ---
----[Open in Browser](https://love2d.org/wiki/Fixture.setUserData)
+---[Open in Browser](https://love2d.org/wiki/Fixture:setUserData)
 ---
----@param value any # The Lua value to associate with the fixture.
+---@param self love.Fixture
+---@param value any The Lua value to associate with the fixture.
 function Fixture:setUserData(value) end
 
 ---Checks if a point is inside the shape of the fixture.
 ---
----[Open in Browser](https://love2d.org/wiki/Fixture.testPoint)
+---[Open in Browser](https://love2d.org/wiki/Fixture:testPoint)
 ---
----@param x number # The x position of the point.
----@param y number # The y position of the point.
----@return boolean
+---@param self love.Fixture
+---@param x number The x position of the point.
+---@param y number The y position of the point.
+---@return boolean isInside True if the point is inside or false if it is outside.
 function Fixture:testPoint(x, y) end
 
---endregion Fixture
+--endregion love.Fixture
 
---region FrictionJoint
+--region love.FrictionJoint
 
 ---A FrictionJoint applies friction to a body.
 ---
 ---[Open in Browser](https://love2d.org/wiki/FrictionJoint)
 ---
----@class FrictionJoint : Joint, Object
+---@class love.FrictionJoint : love.Joint, love.Object
 local FrictionJoint = {}
+
 ---Gets the maximum friction force in Newtons.
 ---
----[Open in Browser](https://love2d.org/wiki/FrictionJoint.getMaxForce)
+---[Open in Browser](https://love2d.org/wiki/FrictionJoint:getMaxForce)
 ---
----@return number
+---@param self love.FrictionJoint
+---@return number force Maximum force in Newtons.
 function FrictionJoint:getMaxForce() end
 
 ---Gets the maximum friction torque in Newton-meters.
 ---
----[Open in Browser](https://love2d.org/wiki/FrictionJoint.getMaxTorque)
+---[Open in Browser](https://love2d.org/wiki/FrictionJoint:getMaxTorque)
 ---
----@return number
+---@param self love.FrictionJoint
+---@return number torque Maximum torque in Newton-meters.
 function FrictionJoint:getMaxTorque() end
 
 ---Sets the maximum friction force in Newtons.
 ---
----[Open in Browser](https://love2d.org/wiki/FrictionJoint.setMaxForce)
+---[Open in Browser](https://love2d.org/wiki/FrictionJoint:setMaxForce)
 ---
----@param maxForce number # Max force in Newtons.
+---@param self love.FrictionJoint
+---@param maxForce number Max force in Newtons.
 function FrictionJoint:setMaxForce(maxForce) end
 
 ---Sets the maximum friction torque in Newton-meters.
 ---
----[Open in Browser](https://love2d.org/wiki/FrictionJoint.setMaxTorque)
+---[Open in Browser](https://love2d.org/wiki/FrictionJoint:setMaxTorque)
 ---
----@param torque number # Maximum torque in Newton-meters.
+---@param self love.FrictionJoint
+---@param torque number Maximum torque in Newton-meters.
 function FrictionJoint:setMaxTorque(torque) end
 
---endregion FrictionJoint
+--endregion love.FrictionJoint
 
---region GearJoint
+--region love.GearJoint
 
 ---Keeps bodies together in such a way that they act like gears.
 ---
 ---[Open in Browser](https://love2d.org/wiki/GearJoint)
 ---
----@class GearJoint : Joint, Object
+---@class love.GearJoint : love.Joint, love.Object
 local GearJoint = {}
+
 ---Get the Joints connected by this GearJoint.
 ---
----[Open in Browser](https://love2d.org/wiki/GearJoint.getJoints)
+---[Open in Browser](https://love2d.org/wiki/GearJoint:getJoints)
 ---
----@return love.Joint, love.Joint
+---@param self love.GearJoint
+---@return love.Joint joint1 The first connected Joint.
+---@return love.Joint joint2 The second connected Joint.
 function GearJoint:getJoints() end
 
 ---Get the ratio of a gear joint.
 ---
----[Open in Browser](https://love2d.org/wiki/GearJoint.getRatio)
+---[Open in Browser](https://love2d.org/wiki/GearJoint:getRatio)
 ---
----@return number
+---@param self love.GearJoint
+---@return number ratio The ratio of the joint.
 function GearJoint:getRatio() end
 
 ---Set the ratio of a gear joint.
 ---
----[Open in Browser](https://love2d.org/wiki/GearJoint.setRatio)
+---[Open in Browser](https://love2d.org/wiki/GearJoint:setRatio)
 ---
----@param ratio number # The new ratio of the joint.
+---@param self love.GearJoint
+---@param ratio number The new ratio of the joint.
 function GearJoint:setRatio(ratio) end
 
---endregion GearJoint
+--endregion love.GearJoint
 
---region Joint
+--region love.Joint
 
 ---Attach multiple bodies together to interact in unique ways.
 ---
 ---[Open in Browser](https://love2d.org/wiki/Joint)
 ---
----@class Joint : Object
+---@class love.Joint : love.Object
 local Joint = {}
+
 ---Explicitly destroys the Joint. An error will occur if you attempt to use the object after calling this function.
 ---
 ---In 0.7.2, when you don't have time to wait for garbage collection, this function 
 ---
 ---may be used to free the object immediately.
 ---
----[Open in Browser](https://love2d.org/wiki/Joint.destroy)
+---[Open in Browser](https://love2d.org/wiki/Joint:destroy)
 ---
+---@param self love.Joint
 function Joint:destroy() end
 
 ---Get the anchor points of the joint.
 ---
----[Open in Browser](https://love2d.org/wiki/Joint.getAnchors)
+---[Open in Browser](https://love2d.org/wiki/Joint:getAnchors)
 ---
----@return number, number, number, number
+---@param self love.Joint
+---@return number x1 The x-component of the anchor on Body 1.
+---@return number y1 The y-component of the anchor on Body 1.
+---@return number x2 The x-component of the anchor on Body 2.
+---@return number y2 The y-component of the anchor on Body 2.
 function Joint:getAnchors() end
 
 ---Gets the bodies that the Joint is attached to.
 ---
----[Open in Browser](https://love2d.org/wiki/Joint.getBodies)
+---[Open in Browser](https://love2d.org/wiki/Joint:getBodies)
 ---
----@return love.Body, love.Body
+---@param self love.Joint
+---@return love.Body bodyA The first Body.
+---@return love.Body bodyB The second Body.
 function Joint:getBodies() end
 
 ---Gets whether the connected Bodies collide.
 ---
----[Open in Browser](https://love2d.org/wiki/Joint.getCollideConnected)
+---[Open in Browser](https://love2d.org/wiki/Joint:getCollideConnected)
 ---
----@return boolean
+---@param self love.Joint
+---@return boolean c True if they collide, false otherwise.
 function Joint:getCollideConnected() end
 
 ---Returns the reaction force in newtons on the second body
 ---
----[Open in Browser](https://love2d.org/wiki/Joint.getReactionForce)
+---[Open in Browser](https://love2d.org/wiki/Joint:getReactionForce)
 ---
----@param x number # How long the force applies. Usually the inverse time step or 1/dt.
----@return number, number
+---@param self love.Joint
+---@param x number How long the force applies. Usually the inverse time step or 1/dt.
+---@return number x The x-component of the force.
+---@return number y The y-component of the force.
 function Joint:getReactionForce(x) end
 
 ---Returns the reaction torque on the second body.
 ---
----[Open in Browser](https://love2d.org/wiki/Joint.getReactionTorque)
+---[Open in Browser](https://love2d.org/wiki/Joint:getReactionTorque)
 ---
----@param invdt number # How long the force applies. Usually the inverse time step or 1/dt.
----@return number
+---@param self love.Joint
+---@param invdt number How long the force applies. Usually the inverse time step or 1/dt.
+---@return number torque The reaction torque on the second body.
 function Joint:getReactionTorque(invdt) end
 
 ---Gets a string representing the type.
 ---
----[Open in Browser](https://love2d.org/wiki/Joint.getType)
+---[Open in Browser](https://love2d.org/wiki/Joint:getType)
 ---
----@return love.JointType
+---@param self love.Joint
+---@return love.JointType type A string with the name of the Joint type.
 function Joint:getType() end
 
 ---Returns the Lua value associated with this Joint.
 ---
----[Open in Browser](https://love2d.org/wiki/Joint.getUserData)
+---[Open in Browser](https://love2d.org/wiki/Joint:getUserData)
 ---
----@return any
+---@param self love.Joint
+---@return any value The Lua value associated with the Joint.
 function Joint:getUserData() end
 
 ---Gets whether the Joint is destroyed. Destroyed joints cannot be used.
 ---
----[Open in Browser](https://love2d.org/wiki/Joint.isDestroyed)
+---[Open in Browser](https://love2d.org/wiki/Joint:isDestroyed)
 ---
----@return boolean
+---@param self love.Joint
+---@return boolean destroyed Whether the Joint is destroyed.
 function Joint:isDestroyed() end
 
 ---Associates a Lua value with the Joint.
 ---
 ---To delete the reference, explicitly pass nil.
 ---
----[Open in Browser](https://love2d.org/wiki/Joint.setUserData)
+---[Open in Browser](https://love2d.org/wiki/Joint:setUserData)
 ---
----@param value any # The Lua value to associate with the Joint.
+---@param self love.Joint
+---@param value any The Lua value to associate with the Joint.
 function Joint:setUserData(value) end
 
---endregion Joint
+--endregion love.Joint
 
---region MotorJoint
+--region love.MotorJoint
 
 ---Controls the relative motion between two Bodies. Position and rotation offsets can be specified, as well as the maximum motor force and torque that will be applied to reach the target offsets.
 ---
 ---[Open in Browser](https://love2d.org/wiki/MotorJoint)
 ---
----@class MotorJoint : Joint, Object
+---@class love.MotorJoint : love.Joint, love.Object
 local MotorJoint = {}
+
 ---Gets the target angular offset between the two Bodies the Joint is attached to.
 ---
----[Open in Browser](https://love2d.org/wiki/MotorJoint.getAngularOffset)
+---[Open in Browser](https://love2d.org/wiki/MotorJoint:getAngularOffset)
 ---
----@return number
+---@param self love.MotorJoint
+---@return number angleoffset The target angular offset in radians: the second body's angle minus the first body's angle.
 function MotorJoint:getAngularOffset() end
 
 ---Gets the target linear offset between the two Bodies the Joint is attached to.
 ---
----[Open in Browser](https://love2d.org/wiki/MotorJoint.getLinearOffset)
+---[Open in Browser](https://love2d.org/wiki/MotorJoint:getLinearOffset)
 ---
----@return number, number
+---@param self love.MotorJoint
+---@return number x The x component of the target linear offset, relative to the first Body.
+---@return number y The y component of the target linear offset, relative to the first Body.
 function MotorJoint:getLinearOffset() end
 
 ---Sets the target angluar offset between the two Bodies the Joint is attached to.
 ---
----[Open in Browser](https://love2d.org/wiki/MotorJoint.setAngularOffset)
+---[Open in Browser](https://love2d.org/wiki/MotorJoint:setAngularOffset)
 ---
----@param angleoffset number # The target angular offset in radians: the second body's angle minus the first body's angle.
+---@param self love.MotorJoint
+---@param angleoffset number The target angular offset in radians: the second body's angle minus the first body's angle.
 function MotorJoint:setAngularOffset(angleoffset) end
 
 ---Sets the target linear offset between the two Bodies the Joint is attached to.
 ---
----[Open in Browser](https://love2d.org/wiki/MotorJoint.setLinearOffset)
+---[Open in Browser](https://love2d.org/wiki/MotorJoint:setLinearOffset)
 ---
----@param x number # The x component of the target linear offset, relative to the first Body.
----@param y number # The y component of the target linear offset, relative to the first Body.
+---@param self love.MotorJoint
+---@param x number The x component of the target linear offset, relative to the first Body.
+---@param y number The y component of the target linear offset, relative to the first Body.
 function MotorJoint:setLinearOffset(x, y) end
 
---endregion MotorJoint
+--endregion love.MotorJoint
 
---region MouseJoint
+--region love.MouseJoint
 
 ---For controlling objects with the mouse.
 ---
 ---[Open in Browser](https://love2d.org/wiki/MouseJoint)
 ---
----@class MouseJoint : Joint, Object
+---@class love.MouseJoint : love.Joint, love.Object
 local MouseJoint = {}
+
 ---Returns the damping ratio.
 ---
----[Open in Browser](https://love2d.org/wiki/MouseJoint.getDampingRatio)
+---[Open in Browser](https://love2d.org/wiki/MouseJoint:getDampingRatio)
 ---
----@return number
+---@param self love.MouseJoint
+---@return number ratio The new damping ratio.
 function MouseJoint:getDampingRatio() end
 
 ---Returns the frequency.
 ---
----[Open in Browser](https://love2d.org/wiki/MouseJoint.getFrequency)
+---[Open in Browser](https://love2d.org/wiki/MouseJoint:getFrequency)
 ---
----@return number
+---@param self love.MouseJoint
+---@return number freq The frequency in hertz.
 function MouseJoint:getFrequency() end
 
 ---Gets the highest allowed force.
 ---
----[Open in Browser](https://love2d.org/wiki/MouseJoint.getMaxForce)
+---[Open in Browser](https://love2d.org/wiki/MouseJoint:getMaxForce)
 ---
----@return number
+---@param self love.MouseJoint
+---@return number f The max allowed force.
 function MouseJoint:getMaxForce() end
 
 ---Gets the target point.
 ---
----[Open in Browser](https://love2d.org/wiki/MouseJoint.getTarget)
+---[Open in Browser](https://love2d.org/wiki/MouseJoint:getTarget)
 ---
----@return number, number
+---@param self love.MouseJoint
+---@return number x The x-component of the target.
+---@return number y The x-component of the target.
 function MouseJoint:getTarget() end
 
 ---Sets a new damping ratio.
 ---
----[Open in Browser](https://love2d.org/wiki/MouseJoint.setDampingRatio)
+---[Open in Browser](https://love2d.org/wiki/MouseJoint:setDampingRatio)
 ---
----@param ratio number # The new damping ratio.
+---@param self love.MouseJoint
+---@param ratio number The new damping ratio.
 function MouseJoint:setDampingRatio(ratio) end
 
 ---Sets a new frequency.
 ---
----[Open in Browser](https://love2d.org/wiki/MouseJoint.setFrequency)
+---[Open in Browser](https://love2d.org/wiki/MouseJoint:setFrequency)
 ---
----@param freq number # The new frequency in hertz.
+---@param self love.MouseJoint
+---@param freq number The new frequency in hertz.
 function MouseJoint:setFrequency(freq) end
 
 ---Sets the highest allowed force.
 ---
----[Open in Browser](https://love2d.org/wiki/MouseJoint.setMaxForce)
+---[Open in Browser](https://love2d.org/wiki/MouseJoint:setMaxForce)
 ---
----@param f number # The max allowed force.
+---@param self love.MouseJoint
+---@param f number The max allowed force.
 function MouseJoint:setMaxForce(f) end
 
 ---Sets the target point.
 ---
----[Open in Browser](https://love2d.org/wiki/MouseJoint.setTarget)
+---[Open in Browser](https://love2d.org/wiki/MouseJoint:setTarget)
 ---
----@param x number # The x-component of the target.
----@param y number # The y-component of the target.
+---@param self love.MouseJoint
+---@param x number The x-component of the target.
+---@param y number The y-component of the target.
 function MouseJoint:setTarget(x, y) end
 
---endregion MouseJoint
+--endregion love.MouseJoint
 
---region PolygonShape
+--region love.PolygonShape
 
 ---A PolygonShape is a convex polygon with up to 8 vertices.
 ---
 ---[Open in Browser](https://love2d.org/wiki/PolygonShape)
 ---
----@class PolygonShape : Shape, Object
+---@class love.PolygonShape : love.Shape, love.Object
 local PolygonShape = {}
+
 ---Get the local coordinates of the polygon's vertices.
 ---
 ---This function has a variable number of return values. It can be used in a nested fashion with love.graphics.polygon.
 ---
----[Open in Browser](https://love2d.org/wiki/PolygonShape.getPoints)
+---[Open in Browser](https://love2d.org/wiki/PolygonShape:getPoints)
 ---
----@return number, number, number, number
+---@param self love.PolygonShape
+---@return number x1 The x-component of the first vertex.
+---@return number y1 The y-component of the first vertex.
+---@return number x2 The x-component of the second vertex.
+---@return number y2 The y-component of the second vertex.
 function PolygonShape:getPoints() end
 
---endregion PolygonShape
+--endregion love.PolygonShape
 
---region PrismaticJoint
+--region love.PrismaticJoint
 
 ---Restricts relative motion between Bodies to one shared axis.
 ---
 ---[Open in Browser](https://love2d.org/wiki/PrismaticJoint)
 ---
----@class PrismaticJoint : Joint, Object
+---@class love.PrismaticJoint : love.Joint, love.Object
 local PrismaticJoint = {}
+
 ---Checks whether the limits are enabled.
 ---
----[Open in Browser](https://love2d.org/wiki/PrismaticJoint.areLimitsEnabled)
+---[Open in Browser](https://love2d.org/wiki/PrismaticJoint:areLimitsEnabled)
 ---
----@return boolean
+---@param self love.PrismaticJoint
+---@return boolean enabled True if enabled, false otherwise.
 function PrismaticJoint:areLimitsEnabled() end
 
 ---Gets the world-space axis vector of the Prismatic Joint.
 ---
----[Open in Browser](https://love2d.org/wiki/PrismaticJoint.getAxis)
+---[Open in Browser](https://love2d.org/wiki/PrismaticJoint:getAxis)
 ---
----@return number, number
+---@param self love.PrismaticJoint
+---@return number x The x-axis coordinate of the world-space axis vector.
+---@return number y The y-axis coordinate of the world-space axis vector.
 function PrismaticJoint:getAxis() end
 
 ---Get the current joint angle speed.
 ---
----[Open in Browser](https://love2d.org/wiki/PrismaticJoint.getJointSpeed)
+---[Open in Browser](https://love2d.org/wiki/PrismaticJoint:getJointSpeed)
 ---
----@return number
+---@param self love.PrismaticJoint
+---@return number s Joint angle speed in meters/second.
 function PrismaticJoint:getJointSpeed() end
 
 ---Get the current joint translation.
 ---
----[Open in Browser](https://love2d.org/wiki/PrismaticJoint.getJointTranslation)
+---[Open in Browser](https://love2d.org/wiki/PrismaticJoint:getJointTranslation)
 ---
----@return number
+---@param self love.PrismaticJoint
+---@return number t Joint translation, usually in meters..
 function PrismaticJoint:getJointTranslation() end
 
 ---Gets the joint limits.
 ---
----[Open in Browser](https://love2d.org/wiki/PrismaticJoint.getLimits)
+---[Open in Browser](https://love2d.org/wiki/PrismaticJoint:getLimits)
 ---
----@return number, number
+---@param self love.PrismaticJoint
+---@return number lower The lower limit, usually in meters.
+---@return number upper The upper limit, usually in meters.
 function PrismaticJoint:getLimits() end
 
 ---Gets the lower limit.
 ---
----[Open in Browser](https://love2d.org/wiki/PrismaticJoint.getLowerLimit)
+---[Open in Browser](https://love2d.org/wiki/PrismaticJoint:getLowerLimit)
 ---
----@return number
+---@param self love.PrismaticJoint
+---@return number lower The lower limit, usually in meters.
 function PrismaticJoint:getLowerLimit() end
 
 ---Gets the maximum motor force.
 ---
----[Open in Browser](https://love2d.org/wiki/PrismaticJoint.getMaxMotorForce)
+---[Open in Browser](https://love2d.org/wiki/PrismaticJoint:getMaxMotorForce)
 ---
----@return number
+---@param self love.PrismaticJoint
+---@return number f The maximum motor force, usually in N.
 function PrismaticJoint:getMaxMotorForce() end
 
 ---Returns the current motor force.
 ---
----[Open in Browser](https://love2d.org/wiki/PrismaticJoint.getMotorForce)
+---[Open in Browser](https://love2d.org/wiki/PrismaticJoint:getMotorForce)
 ---
----@param invdt number # How long the force applies. Usually the inverse time step or 1/dt.
----@return number
+---@param self love.PrismaticJoint
+---@param invdt number How long the force applies. Usually the inverse time step or 1/dt.
+---@return number force The force on the motor in newtons.
 function PrismaticJoint:getMotorForce(invdt) end
 
 ---Gets the motor speed.
 ---
----[Open in Browser](https://love2d.org/wiki/PrismaticJoint.getMotorSpeed)
+---[Open in Browser](https://love2d.org/wiki/PrismaticJoint:getMotorSpeed)
 ---
----@return number
+---@param self love.PrismaticJoint
+---@return number s The motor speed, usually in meters per second.
 function PrismaticJoint:getMotorSpeed() end
 
 ---Gets the reference angle.
 ---
----[Open in Browser](https://love2d.org/wiki/PrismaticJoint.getReferenceAngle)
+---[Open in Browser](https://love2d.org/wiki/PrismaticJoint:getReferenceAngle)
 ---
----@return number
+---@param self love.PrismaticJoint
+---@return number angle The reference angle in radians.
 function PrismaticJoint:getReferenceAngle() end
 
 ---Gets the upper limit.
 ---
----[Open in Browser](https://love2d.org/wiki/PrismaticJoint.getUpperLimit)
+---[Open in Browser](https://love2d.org/wiki/PrismaticJoint:getUpperLimit)
 ---
----@return number
+---@param self love.PrismaticJoint
+---@return number upper The upper limit, usually in meters.
 function PrismaticJoint:getUpperLimit() end
 
 ---Checks whether the motor is enabled.
 ---
----[Open in Browser](https://love2d.org/wiki/PrismaticJoint.isMotorEnabled)
+---[Open in Browser](https://love2d.org/wiki/PrismaticJoint:isMotorEnabled)
 ---
----@return boolean
+---@param self love.PrismaticJoint
+---@return boolean enabled True if enabled, false if disabled.
 function PrismaticJoint:isMotorEnabled() end
 
 ---Sets the limits.
 ---
----[Open in Browser](https://love2d.org/wiki/PrismaticJoint.setLimits)
+---[Open in Browser](https://love2d.org/wiki/PrismaticJoint:setLimits)
 ---
----@param lower number # The lower limit, usually in meters.
----@param upper number # The upper limit, usually in meters.
+---@param self love.PrismaticJoint
+---@param lower number The lower limit, usually in meters.
+---@param upper number The upper limit, usually in meters.
 function PrismaticJoint:setLimits(lower, upper) end
 
 ---Enables/disables the joint limit.
 ---
----[Open in Browser](https://love2d.org/wiki/PrismaticJoint.setLimitsEnabled)
+---[Open in Browser](https://love2d.org/wiki/PrismaticJoint:setLimitsEnabled)
 ---
----@return boolean
+---@param self love.PrismaticJoint
+---@return boolean enable True if enabled, false if disabled.
 function PrismaticJoint:setLimitsEnabled() end
 
 ---Sets the lower limit.
 ---
----[Open in Browser](https://love2d.org/wiki/PrismaticJoint.setLowerLimit)
+---[Open in Browser](https://love2d.org/wiki/PrismaticJoint:setLowerLimit)
 ---
----@param lower number # The lower limit, usually in meters.
+---@param self love.PrismaticJoint
+---@param lower number The lower limit, usually in meters.
 function PrismaticJoint:setLowerLimit(lower) end
 
 ---Set the maximum motor force.
 ---
----[Open in Browser](https://love2d.org/wiki/PrismaticJoint.setMaxMotorForce)
+---[Open in Browser](https://love2d.org/wiki/PrismaticJoint:setMaxMotorForce)
 ---
----@param f number # The maximum motor force, usually in N.
+---@param self love.PrismaticJoint
+---@param f number The maximum motor force, usually in N.
 function PrismaticJoint:setMaxMotorForce(f) end
 
 ---Enables/disables the joint motor.
 ---
----[Open in Browser](https://love2d.org/wiki/PrismaticJoint.setMotorEnabled)
+---[Open in Browser](https://love2d.org/wiki/PrismaticJoint:setMotorEnabled)
 ---
----@param enable boolean # True to enable, false to disable.
+---@param self love.PrismaticJoint
+---@param enable boolean True to enable, false to disable.
 function PrismaticJoint:setMotorEnabled(enable) end
 
 ---Sets the motor speed.
 ---
----[Open in Browser](https://love2d.org/wiki/PrismaticJoint.setMotorSpeed)
+---[Open in Browser](https://love2d.org/wiki/PrismaticJoint:setMotorSpeed)
 ---
----@param s number # The motor speed, usually in meters per second.
+---@param self love.PrismaticJoint
+---@param s number The motor speed, usually in meters per second.
 function PrismaticJoint:setMotorSpeed(s) end
 
 ---Sets the upper limit.
 ---
----[Open in Browser](https://love2d.org/wiki/PrismaticJoint.setUpperLimit)
+---[Open in Browser](https://love2d.org/wiki/PrismaticJoint:setUpperLimit)
 ---
----@param upper number # The upper limit, usually in meters.
+---@param self love.PrismaticJoint
+---@param upper number The upper limit, usually in meters.
 function PrismaticJoint:setUpperLimit(upper) end
 
---endregion PrismaticJoint
+--endregion love.PrismaticJoint
 
---region PulleyJoint
+--region love.PulleyJoint
 
 ---Allows you to simulate bodies connected through pulleys.
 ---
 ---[Open in Browser](https://love2d.org/wiki/PulleyJoint)
 ---
----@class PulleyJoint : Joint, Object
+---@class love.PulleyJoint : love.Joint, love.Object
 local PulleyJoint = {}
+
 ---Get the total length of the rope.
 ---
----[Open in Browser](https://love2d.org/wiki/PulleyJoint.getConstant)
+---[Open in Browser](https://love2d.org/wiki/PulleyJoint:getConstant)
 ---
----@return number
+---@param self love.PulleyJoint
+---@return number length The length of the rope in the joint.
 function PulleyJoint:getConstant() end
 
 ---Get the ground anchor positions in world coordinates.
 ---
----[Open in Browser](https://love2d.org/wiki/PulleyJoint.getGroundAnchors)
+---[Open in Browser](https://love2d.org/wiki/PulleyJoint:getGroundAnchors)
 ---
----@return number, number, number, number
+---@param self love.PulleyJoint
+---@return number a1x The x coordinate of the first anchor.
+---@return number a1y The y coordinate of the first anchor.
+---@return number a2x The x coordinate of the second anchor.
+---@return number a2y The y coordinate of the second anchor.
 function PulleyJoint:getGroundAnchors() end
 
 ---Get the current length of the rope segment attached to the first body.
 ---
----[Open in Browser](https://love2d.org/wiki/PulleyJoint.getLengthA)
+---[Open in Browser](https://love2d.org/wiki/PulleyJoint:getLengthA)
 ---
----@return number
+---@param self love.PulleyJoint
+---@return number length The length of the rope segment.
 function PulleyJoint:getLengthA() end
 
 ---Get the current length of the rope segment attached to the second body.
 ---
----[Open in Browser](https://love2d.org/wiki/PulleyJoint.getLengthB)
+---[Open in Browser](https://love2d.org/wiki/PulleyJoint:getLengthB)
 ---
----@return number
+---@param self love.PulleyJoint
+---@return number length The length of the rope segment.
 function PulleyJoint:getLengthB() end
 
 ---Get the maximum lengths of the rope segments.
 ---
----[Open in Browser](https://love2d.org/wiki/PulleyJoint.getMaxLengths)
+---[Open in Browser](https://love2d.org/wiki/PulleyJoint:getMaxLengths)
 ---
----@return number, number
+---@param self love.PulleyJoint
+---@return number len1 The maximum length of the first rope segment.
+---@return number len2 The maximum length of the second rope segment.
 function PulleyJoint:getMaxLengths() end
 
 ---Get the pulley ratio.
 ---
----[Open in Browser](https://love2d.org/wiki/PulleyJoint.getRatio)
+---[Open in Browser](https://love2d.org/wiki/PulleyJoint:getRatio)
 ---
----@return number
+---@param self love.PulleyJoint
+---@return number ratio The pulley ratio of the joint.
 function PulleyJoint:getRatio() end
 
 ---Set the total length of the rope.
 ---
 ---Setting a new length for the rope updates the maximum length values of the joint.
 ---
----[Open in Browser](https://love2d.org/wiki/PulleyJoint.setConstant)
+---[Open in Browser](https://love2d.org/wiki/PulleyJoint:setConstant)
 ---
----@param length number # The new length of the rope in the joint.
+---@param self love.PulleyJoint
+---@param length number The new length of the rope in the joint.
 function PulleyJoint:setConstant(length) end
 
 ---Set the maximum lengths of the rope segments.
 ---
 ---The physics module also imposes maximum values for the rope segments. If the parameters exceed these values, the maximum values are set instead of the requested values.
 ---
----[Open in Browser](https://love2d.org/wiki/PulleyJoint.setMaxLengths)
+---[Open in Browser](https://love2d.org/wiki/PulleyJoint:setMaxLengths)
 ---
----@param max1 number # The new maximum length of the first segment.
----@param max2 number # The new maximum length of the second segment.
+---@param self love.PulleyJoint
+---@param max1 number The new maximum length of the first segment.
+---@param max2 number The new maximum length of the second segment.
 function PulleyJoint:setMaxLengths(max1, max2) end
 
 ---Set the pulley ratio.
 ---
----[Open in Browser](https://love2d.org/wiki/PulleyJoint.setRatio)
+---[Open in Browser](https://love2d.org/wiki/PulleyJoint:setRatio)
 ---
----@param ratio number # The new pulley ratio of the joint.
+---@param self love.PulleyJoint
+---@param ratio number The new pulley ratio of the joint.
 function PulleyJoint:setRatio(ratio) end
 
---endregion PulleyJoint
+--endregion love.PulleyJoint
 
---region RevoluteJoint
+--region love.RevoluteJoint
 
 ---Allow two Bodies to revolve around a shared point.
 ---
 ---[Open in Browser](https://love2d.org/wiki/RevoluteJoint)
 ---
----@class RevoluteJoint : Joint, Object
+---@class love.RevoluteJoint : love.Joint, love.Object
 local RevoluteJoint = {}
+
 ---Checks whether limits are enabled.
 ---
----[Open in Browser](https://love2d.org/wiki/RevoluteJoint.areLimitsEnabled)
+---[Open in Browser](https://love2d.org/wiki/RevoluteJoint:areLimitsEnabled)
 ---
----@return boolean
+---@param self love.RevoluteJoint
+---@return boolean enabled True if enabled, false otherwise.
 function RevoluteJoint:areLimitsEnabled() end
 
 ---Get the current joint angle.
 ---
----[Open in Browser](https://love2d.org/wiki/RevoluteJoint.getJointAngle)
+---[Open in Browser](https://love2d.org/wiki/RevoluteJoint:getJointAngle)
 ---
----@return number
+---@param self love.RevoluteJoint
+---@return number angle The joint angle in radians.
 function RevoluteJoint:getJointAngle() end
 
 ---Get the current joint angle speed.
 ---
----[Open in Browser](https://love2d.org/wiki/RevoluteJoint.getJointSpeed)
+---[Open in Browser](https://love2d.org/wiki/RevoluteJoint:getJointSpeed)
 ---
----@return number
+---@param self love.RevoluteJoint
+---@return number s Joint angle speed in radians/second.
 function RevoluteJoint:getJointSpeed() end
 
 ---Gets the joint limits.
 ---
----[Open in Browser](https://love2d.org/wiki/RevoluteJoint.getLimits)
+---[Open in Browser](https://love2d.org/wiki/RevoluteJoint:getLimits)
 ---
----@return number, number
+---@param self love.RevoluteJoint
+---@return number lower The lower limit, in radians.
+---@return number upper The upper limit, in radians.
 function RevoluteJoint:getLimits() end
 
 ---Gets the lower limit.
 ---
----[Open in Browser](https://love2d.org/wiki/RevoluteJoint.getLowerLimit)
+---[Open in Browser](https://love2d.org/wiki/RevoluteJoint:getLowerLimit)
 ---
----@return number
+---@param self love.RevoluteJoint
+---@return number lower The lower limit, in radians.
 function RevoluteJoint:getLowerLimit() end
 
 ---Gets the maximum motor force.
 ---
----[Open in Browser](https://love2d.org/wiki/RevoluteJoint.getMaxMotorTorque)
+---[Open in Browser](https://love2d.org/wiki/RevoluteJoint:getMaxMotorTorque)
 ---
----@return number
+---@param self love.RevoluteJoint
+---@return number f The maximum motor force, in Nm.
 function RevoluteJoint:getMaxMotorTorque() end
 
 ---Gets the motor speed.
 ---
----[Open in Browser](https://love2d.org/wiki/RevoluteJoint.getMotorSpeed)
+---[Open in Browser](https://love2d.org/wiki/RevoluteJoint:getMotorSpeed)
 ---
----@return number
+---@param self love.RevoluteJoint
+---@return number s The motor speed, radians per second.
 function RevoluteJoint:getMotorSpeed() end
 
 ---Get the current motor force.
 ---
----[Open in Browser](https://love2d.org/wiki/RevoluteJoint.getMotorTorque)
+---[Open in Browser](https://love2d.org/wiki/RevoluteJoint:getMotorTorque)
 ---
----@return number
+---@param self love.RevoluteJoint
+---@return number f The current motor force, in Nm.
 function RevoluteJoint:getMotorTorque() end
 
 ---Gets the reference angle.
 ---
----[Open in Browser](https://love2d.org/wiki/RevoluteJoint.getReferenceAngle)
+---[Open in Browser](https://love2d.org/wiki/RevoluteJoint:getReferenceAngle)
 ---
----@return number
+---@param self love.RevoluteJoint
+---@return number angle The reference angle in radians.
 function RevoluteJoint:getReferenceAngle() end
 
 ---Gets the upper limit.
 ---
----[Open in Browser](https://love2d.org/wiki/RevoluteJoint.getUpperLimit)
+---[Open in Browser](https://love2d.org/wiki/RevoluteJoint:getUpperLimit)
 ---
----@return number
+---@param self love.RevoluteJoint
+---@return number upper The upper limit, in radians.
 function RevoluteJoint:getUpperLimit() end
 
 ---Checks whether limits are enabled.
 ---
----[Open in Browser](https://love2d.org/wiki/RevoluteJoint.hasLimitsEnabled)
+---[Open in Browser](https://love2d.org/wiki/RevoluteJoint:hasLimitsEnabled)
 ---
----@return boolean
+---@param self love.RevoluteJoint
+---@return boolean enabled True if enabled, false otherwise.
 function RevoluteJoint:hasLimitsEnabled() end
 
 ---Checks whether the motor is enabled.
 ---
----[Open in Browser](https://love2d.org/wiki/RevoluteJoint.isMotorEnabled)
+---[Open in Browser](https://love2d.org/wiki/RevoluteJoint:isMotorEnabled)
 ---
----@return boolean
+---@param self love.RevoluteJoint
+---@return boolean enabled True if enabled, false if disabled.
 function RevoluteJoint:isMotorEnabled() end
 
 ---Sets the limits.
 ---
----[Open in Browser](https://love2d.org/wiki/RevoluteJoint.setLimits)
+---[Open in Browser](https://love2d.org/wiki/RevoluteJoint:setLimits)
 ---
----@param lower number # The lower limit, in radians.
----@param upper number # The upper limit, in radians.
+---@param self love.RevoluteJoint
+---@param lower number The lower limit, in radians.
+---@param upper number The upper limit, in radians.
 function RevoluteJoint:setLimits(lower, upper) end
 
 ---Enables/disables the joint limit.
 ---
----[Open in Browser](https://love2d.org/wiki/RevoluteJoint.setLimitsEnabled)
+---[Open in Browser](https://love2d.org/wiki/RevoluteJoint:setLimitsEnabled)
 ---
----@param enable boolean # True to enable, false to disable.
+---@param self love.RevoluteJoint
+---@param enable boolean True to enable, false to disable.
 function RevoluteJoint:setLimitsEnabled(enable) end
 
 ---Sets the lower limit.
 ---
----[Open in Browser](https://love2d.org/wiki/RevoluteJoint.setLowerLimit)
+---[Open in Browser](https://love2d.org/wiki/RevoluteJoint:setLowerLimit)
 ---
----@param lower number # The lower limit, in radians.
+---@param self love.RevoluteJoint
+---@param lower number The lower limit, in radians.
 function RevoluteJoint:setLowerLimit(lower) end
 
 ---Set the maximum motor force.
 ---
----[Open in Browser](https://love2d.org/wiki/RevoluteJoint.setMaxMotorTorque)
+---[Open in Browser](https://love2d.org/wiki/RevoluteJoint:setMaxMotorTorque)
 ---
----@param f number # The maximum motor force, in Nm.
+---@param self love.RevoluteJoint
+---@param f number The maximum motor force, in Nm.
 function RevoluteJoint:setMaxMotorTorque(f) end
 
 ---Enables/disables the joint motor.
 ---
----[Open in Browser](https://love2d.org/wiki/RevoluteJoint.setMotorEnabled)
+---[Open in Browser](https://love2d.org/wiki/RevoluteJoint:setMotorEnabled)
 ---
----@param enable boolean # True to enable, false to disable.
+---@param self love.RevoluteJoint
+---@param enable boolean True to enable, false to disable.
 function RevoluteJoint:setMotorEnabled(enable) end
 
 ---Sets the motor speed.
 ---
----[Open in Browser](https://love2d.org/wiki/RevoluteJoint.setMotorSpeed)
+---[Open in Browser](https://love2d.org/wiki/RevoluteJoint:setMotorSpeed)
 ---
----@param s number # The motor speed, radians per second.
+---@param self love.RevoluteJoint
+---@param s number The motor speed, radians per second.
 function RevoluteJoint:setMotorSpeed(s) end
 
 ---Sets the upper limit.
 ---
----[Open in Browser](https://love2d.org/wiki/RevoluteJoint.setUpperLimit)
+---[Open in Browser](https://love2d.org/wiki/RevoluteJoint:setUpperLimit)
 ---
----@param upper number # The upper limit, in radians.
+---@param self love.RevoluteJoint
+---@param upper number The upper limit, in radians.
 function RevoluteJoint:setUpperLimit(upper) end
 
---endregion RevoluteJoint
+--endregion love.RevoluteJoint
 
---region RopeJoint
+--region love.RopeJoint
 
 ---The RopeJoint enforces a maximum distance between two points on two bodies. It has no other effect.
 ---
 ---[Open in Browser](https://love2d.org/wiki/RopeJoint)
 ---
----@class RopeJoint : Joint, Object
+---@class love.RopeJoint : love.Joint, love.Object
 local RopeJoint = {}
+
 ---Gets the maximum length of a RopeJoint.
 ---
----[Open in Browser](https://love2d.org/wiki/RopeJoint.getMaxLength)
+---[Open in Browser](https://love2d.org/wiki/RopeJoint:getMaxLength)
 ---
----@return number
+---@param self love.RopeJoint
+---@return number maxLength The maximum length of the RopeJoint.
 function RopeJoint:getMaxLength() end
 
 ---Sets the maximum length of a RopeJoint.
 ---
----[Open in Browser](https://love2d.org/wiki/RopeJoint.setMaxLength)
+---[Open in Browser](https://love2d.org/wiki/RopeJoint:setMaxLength)
 ---
----@param maxLength number # The new maximum length of the RopeJoint.
+---@param self love.RopeJoint
+---@param maxLength number The new maximum length of the RopeJoint.
 function RopeJoint:setMaxLength(maxLength) end
 
---endregion RopeJoint
+--endregion love.RopeJoint
 
---region Shape
+--region love.Shape
 
 ---Shapes are solid 2d geometrical objects which handle the mass and collision of a Body in love.physics.
 ---
@@ -1859,48 +2147,60 @@ function RopeJoint:setMaxLength(maxLength) end
 ---
 ---[Open in Browser](https://love2d.org/wiki/Shape)
 ---
----@class Shape : Object
+---@class love.Shape : love.Object
 local Shape = {}
+
 ---Returns the points of the bounding box for the transformed shape.
 ---
----[Open in Browser](https://love2d.org/wiki/Shape.computeAABB)
+---[Open in Browser](https://love2d.org/wiki/Shape:computeAABB)
 ---
----@param tx number # The translation of the shape on the x-axis.
----@param ty number # The translation of the shape on the y-axis.
----@param tr number # The shape rotation.
----@param childIndex number? # The index of the child to compute the bounding box of. (Defaults to 1.)
----@return number, number, number, number
+---@param self love.Shape
+---@param tx number The translation of the shape on the x-axis.
+---@param ty number The translation of the shape on the y-axis.
+---@param tr number The shape rotation.
+---@param childIndex number? The index of the child to compute the bounding box of. (defaults to `1`.)
+---@return number topLeftX The x position of the top-left point.
+---@return number topLeftY The y position of the top-left point.
+---@return number bottomRightX The x position of the bottom-right point.
+---@return number bottomRightY The y position of the bottom-right point.
 function Shape:computeAABB(tx, ty, tr, childIndex) end
 
 ---Computes the mass properties for the shape with the specified density.
 ---
----[Open in Browser](https://love2d.org/wiki/Shape.computeMass)
+---[Open in Browser](https://love2d.org/wiki/Shape:computeMass)
 ---
----@param density number # The shape density.
----@return number, number, number, number
+---@param self love.Shape
+---@param density number The shape density.
+---@return number x The x postition of the center of mass.
+---@return number y The y postition of the center of mass.
+---@return number mass The mass of the shape.
+---@return number inertia The rotational inertia.
 function Shape:computeMass(density) end
 
 ---Returns the number of children the shape has.
 ---
----[Open in Browser](https://love2d.org/wiki/Shape.getChildCount)
+---[Open in Browser](https://love2d.org/wiki/Shape:getChildCount)
 ---
----@return number
+---@param self love.Shape
+---@return number count The number of children.
 function Shape:getChildCount() end
 
 ---Gets the radius of the shape.
 ---
----[Open in Browser](https://love2d.org/wiki/Shape.getRadius)
+---[Open in Browser](https://love2d.org/wiki/Shape:getRadius)
 ---
----@return number
+---@param self love.Shape
+---@return number radius The radius of the shape.
 function Shape:getRadius() end
 
 ---Gets a string representing the Shape.
 ---
 ---This function can be useful for conditional debug drawing.
 ---
----[Open in Browser](https://love2d.org/wiki/Shape.getType)
+---[Open in Browser](https://love2d.org/wiki/Shape:getType)
 ---
----@return love.ShapeType
+---@param self love.Shape
+---@return love.ShapeType type The type of the Shape.
 function Shape:getType() end
 
 ---Casts a ray against the shape and returns the surface normal vector and the line position where the ray hit. If the ray missed the shape, nil will be returned. The Shape can be transformed to get it into the desired position.
@@ -1913,310 +2213,357 @@ function Shape:getType() end
 ---
 ---hitx, hity = x1 + (x2 - x1) * fraction, y1 + (y2 - y1) * fraction
 ---
----[Open in Browser](https://love2d.org/wiki/Shape.rayCast)
+---[Open in Browser](https://love2d.org/wiki/Shape:rayCast)
 ---
----@param x1 number # The x position of the input line starting point.
----@param y1 number # The y position of the input line starting point.
----@param x2 number # The x position of the input line end point.
----@param y2 number # The y position of the input line end point.
----@param maxFraction number # Ray length parameter.
----@param tx number # The translation of the shape on the x-axis.
----@param ty number # The translation of the shape on the y-axis.
----@param tr number # The shape rotation.
----@param childIndex number? # The index of the child the ray gets cast against. (Defaults to 1.)
----@return number, number, number
+---@param self love.Shape
+---@param x1 number The x position of the input line starting point.
+---@param y1 number The y position of the input line starting point.
+---@param x2 number The x position of the input line end point.
+---@param y2 number The y position of the input line end point.
+---@param maxFraction number Ray length parameter.
+---@param tx number The translation of the shape on the x-axis.
+---@param ty number The translation of the shape on the y-axis.
+---@param tr number The shape rotation.
+---@param childIndex number? The index of the child the ray gets cast against. (defaults to `1`.)
+---@return number xn The x component of the normal vector of the edge where the ray hit the shape.
+---@return number yn The y component of the normal vector of the edge where the ray hit the shape.
+---@return number fraction The position on the input line where the intersection happened as a factor of the line length.
 function Shape:rayCast(x1, y1, x2, y2, maxFraction, tx, ty, tr, childIndex) end
 
 ---This is particularly useful for mouse interaction with the shapes. By looping through all shapes and testing the mouse position with this function, we can find which shapes the mouse touches.
 ---
----[Open in Browser](https://love2d.org/wiki/Shape.testPoint)
+---[Open in Browser](https://love2d.org/wiki/Shape:testPoint)
 ---
----@param tx number # Translates the shape along the x-axis.
----@param ty number # Translates the shape along the y-axis.
----@param tr number # Rotates the shape.
----@param x number # The x-component of the point.
----@param y number # The y-component of the point.
----@return boolean
+---@param self love.Shape
+---@param tx number Translates the shape along the x-axis.
+---@param ty number Translates the shape along the y-axis.
+---@param tr number Rotates the shape.
+---@param x number The x-component of the point.
+---@param y number The y-component of the point.
+---@return boolean hit True if inside, false if outside
 function Shape:testPoint(tx, ty, tr, x, y) end
 
---endregion Shape
+--endregion love.Shape
 
---region WeldJoint
+--region love.WeldJoint
 
 ---A WeldJoint essentially glues two bodies together.
 ---
 ---[Open in Browser](https://love2d.org/wiki/WeldJoint)
 ---
----@class WeldJoint : Joint, Object
+---@class love.WeldJoint : love.Joint, love.Object
 local WeldJoint = {}
+
 ---Returns the damping ratio of the joint.
 ---
----[Open in Browser](https://love2d.org/wiki/WeldJoint.getDampingRatio)
+---[Open in Browser](https://love2d.org/wiki/WeldJoint:getDampingRatio)
 ---
----@return number
+---@param self love.WeldJoint
+---@return number ratio The damping ratio.
 function WeldJoint:getDampingRatio() end
 
 ---Returns the frequency.
 ---
----[Open in Browser](https://love2d.org/wiki/WeldJoint.getFrequency)
+---[Open in Browser](https://love2d.org/wiki/WeldJoint:getFrequency)
 ---
----@return number
+---@param self love.WeldJoint
+---@return number freq The frequency in hertz.
 function WeldJoint:getFrequency() end
 
 ---Gets the reference angle.
 ---
----[Open in Browser](https://love2d.org/wiki/WeldJoint.getReferenceAngle)
+---[Open in Browser](https://love2d.org/wiki/WeldJoint:getReferenceAngle)
 ---
----@return number
+---@param self love.WeldJoint
+---@return number angle The reference angle in radians.
 function WeldJoint:getReferenceAngle() end
 
 ---Sets a new damping ratio.
 ---
----[Open in Browser](https://love2d.org/wiki/WeldJoint.setDampingRatio)
+---[Open in Browser](https://love2d.org/wiki/WeldJoint:setDampingRatio)
 ---
----@param ratio number # The new damping ratio.
+---@param self love.WeldJoint
+---@param ratio number The new damping ratio.
 function WeldJoint:setDampingRatio(ratio) end
 
 ---Sets a new frequency.
 ---
----[Open in Browser](https://love2d.org/wiki/WeldJoint.setFrequency)
+---[Open in Browser](https://love2d.org/wiki/WeldJoint:setFrequency)
 ---
----@param freq number # The new frequency in hertz.
+---@param self love.WeldJoint
+---@param freq number The new frequency in hertz.
 function WeldJoint:setFrequency(freq) end
 
---endregion WeldJoint
+--endregion love.WeldJoint
 
---region WheelJoint
+--region love.WheelJoint
 
 ---Restricts a point on the second body to a line on the first body.
 ---
 ---[Open in Browser](https://love2d.org/wiki/WheelJoint)
 ---
----@class WheelJoint : Joint, Object
+---@class love.WheelJoint : love.Joint, love.Object
 local WheelJoint = {}
+
 ---Gets the world-space axis vector of the Wheel Joint.
 ---
----[Open in Browser](https://love2d.org/wiki/WheelJoint.getAxis)
+---[Open in Browser](https://love2d.org/wiki/WheelJoint:getAxis)
 ---
----@return number, number
+---@param self love.WheelJoint
+---@return number x The x-axis coordinate of the world-space axis vector.
+---@return number y The y-axis coordinate of the world-space axis vector.
 function WheelJoint:getAxis() end
 
 ---Returns the current joint translation speed.
 ---
----[Open in Browser](https://love2d.org/wiki/WheelJoint.getJointSpeed)
+---[Open in Browser](https://love2d.org/wiki/WheelJoint:getJointSpeed)
 ---
----@return number
+---@param self love.WheelJoint
+---@return number speed The translation speed of the joint in meters per second.
 function WheelJoint:getJointSpeed() end
 
 ---Returns the current joint translation.
 ---
----[Open in Browser](https://love2d.org/wiki/WheelJoint.getJointTranslation)
+---[Open in Browser](https://love2d.org/wiki/WheelJoint:getJointTranslation)
 ---
----@return number
+---@param self love.WheelJoint
+---@return number position The translation of the joint in meters.
 function WheelJoint:getJointTranslation() end
 
 ---Returns the maximum motor torque.
 ---
----[Open in Browser](https://love2d.org/wiki/WheelJoint.getMaxMotorTorque)
+---[Open in Browser](https://love2d.org/wiki/WheelJoint:getMaxMotorTorque)
 ---
----@return number
+---@param self love.WheelJoint
+---@return number maxTorque The maximum torque of the joint motor in newton meters.
 function WheelJoint:getMaxMotorTorque() end
 
 ---Returns the speed of the motor.
 ---
----[Open in Browser](https://love2d.org/wiki/WheelJoint.getMotorSpeed)
+---[Open in Browser](https://love2d.org/wiki/WheelJoint:getMotorSpeed)
 ---
----@return number
+---@param self love.WheelJoint
+---@return number speed The speed of the joint motor in radians per second.
 function WheelJoint:getMotorSpeed() end
 
 ---Returns the current torque on the motor.
 ---
----[Open in Browser](https://love2d.org/wiki/WheelJoint.getMotorTorque)
+---[Open in Browser](https://love2d.org/wiki/WheelJoint:getMotorTorque)
 ---
----@param invdt number # How long the force applies. Usually the inverse time step or 1/dt.
----@return number
+---@param self love.WheelJoint
+---@param invdt number How long the force applies. Usually the inverse time step or 1/dt.
+---@return number torque The torque on the motor in newton meters.
 function WheelJoint:getMotorTorque(invdt) end
 
 ---Returns the damping ratio.
 ---
----[Open in Browser](https://love2d.org/wiki/WheelJoint.getSpringDampingRatio)
+---[Open in Browser](https://love2d.org/wiki/WheelJoint:getSpringDampingRatio)
 ---
----@return number
+---@param self love.WheelJoint
+---@return number ratio The damping ratio.
 function WheelJoint:getSpringDampingRatio() end
 
 ---Returns the spring frequency.
 ---
----[Open in Browser](https://love2d.org/wiki/WheelJoint.getSpringFrequency)
+---[Open in Browser](https://love2d.org/wiki/WheelJoint:getSpringFrequency)
 ---
----@return number
+---@param self love.WheelJoint
+---@return number freq The frequency in hertz.
 function WheelJoint:getSpringFrequency() end
 
 ---Checks if the joint motor is running.
 ---
----[Open in Browser](https://love2d.org/wiki/WheelJoint.isMotorEnabled)
+---[Open in Browser](https://love2d.org/wiki/WheelJoint:isMotorEnabled)
 ---
----@return boolean
+---@param self love.WheelJoint
+---@return boolean on The status of the joint motor.
 function WheelJoint:isMotorEnabled() end
 
 ---Sets a new maximum motor torque.
 ---
----[Open in Browser](https://love2d.org/wiki/WheelJoint.setMaxMotorTorque)
+---[Open in Browser](https://love2d.org/wiki/WheelJoint:setMaxMotorTorque)
 ---
----@param maxTorque number # The new maximum torque for the joint motor in newton meters.
+---@param self love.WheelJoint
+---@param maxTorque number The new maximum torque for the joint motor in newton meters.
 function WheelJoint:setMaxMotorTorque(maxTorque) end
 
 ---Starts and stops the joint motor.
 ---
----[Open in Browser](https://love2d.org/wiki/WheelJoint.setMotorEnabled)
+---[Open in Browser](https://love2d.org/wiki/WheelJoint:setMotorEnabled)
 ---
----@param enable boolean # True turns the motor on and false turns it off.
+---@param self love.WheelJoint
+---@param enable boolean True turns the motor on and false turns it off.
 function WheelJoint:setMotorEnabled(enable) end
 
 ---Sets a new speed for the motor.
 ---
----[Open in Browser](https://love2d.org/wiki/WheelJoint.setMotorSpeed)
+---[Open in Browser](https://love2d.org/wiki/WheelJoint:setMotorSpeed)
 ---
----@param speed number # The new speed for the joint motor in radians per second.
+---@param self love.WheelJoint
+---@param speed number The new speed for the joint motor in radians per second.
 function WheelJoint:setMotorSpeed(speed) end
 
 ---Sets a new damping ratio.
 ---
----[Open in Browser](https://love2d.org/wiki/WheelJoint.setSpringDampingRatio)
+---[Open in Browser](https://love2d.org/wiki/WheelJoint:setSpringDampingRatio)
 ---
----@param ratio number # The new damping ratio.
+---@param self love.WheelJoint
+---@param ratio number The new damping ratio.
 function WheelJoint:setSpringDampingRatio(ratio) end
 
 ---Sets a new spring frequency.
 ---
----[Open in Browser](https://love2d.org/wiki/WheelJoint.setSpringFrequency)
+---[Open in Browser](https://love2d.org/wiki/WheelJoint:setSpringFrequency)
 ---
----@param freq number # The new frequency in hertz.
+---@param self love.WheelJoint
+---@param freq number The new frequency in hertz.
 function WheelJoint:setSpringFrequency(freq) end
 
---endregion WheelJoint
+--endregion love.WheelJoint
 
---region World
+--region love.World
 
 ---A world is an object that contains all bodies and joints.
 ---
 ---[Open in Browser](https://love2d.org/wiki/World)
 ---
----@class World : Object
+---@class love.World : love.Object
 local World = {}
+
 ---Destroys the world, taking all bodies, joints, fixtures and their shapes with it. 
 ---
 ---An error will occur if you attempt to use any of the destroyed objects after calling this function.
 ---
----[Open in Browser](https://love2d.org/wiki/World.destroy)
+---[Open in Browser](https://love2d.org/wiki/World:destroy)
 ---
+---@param self love.World
 function World:destroy() end
 
 ---Returns a table with all bodies.
 ---
----[Open in Browser](https://love2d.org/wiki/World.getBodies)
+---[Open in Browser](https://love2d.org/wiki/World:getBodies)
 ---
----@return table
+---@param self love.World
+---@return love.Body[] bodies A sequence with all bodies.
 function World:getBodies() end
 
 ---Returns the number of bodies in the world.
 ---
----[Open in Browser](https://love2d.org/wiki/World.getBodyCount)
+---[Open in Browser](https://love2d.org/wiki/World:getBodyCount)
 ---
----@return number
+---@param self love.World
+---@return number n The number of bodies in the world.
 function World:getBodyCount() end
 
 ---Returns functions for the callbacks during the world update.
 ---
----[Open in Browser](https://love2d.org/wiki/World.getCallbacks)
+---[Open in Browser](https://love2d.org/wiki/World:getCallbacks)
 ---
----@return function, function, function, function
+---@param self love.World
+---@return function beginContact Gets called when two fixtures begin to overlap.
+---@return function endContact Gets called when two fixtures cease to overlap.
+---@return function preSolve Gets called before a collision gets resolved.
+---@return function postSolve Gets called after the collision has been resolved.
 function World:getCallbacks() end
 
 ---Returns the number of contacts in the world.
 ---
----[Open in Browser](https://love2d.org/wiki/World.getContactCount)
+---[Open in Browser](https://love2d.org/wiki/World:getContactCount)
 ---
----@return number
+---@param self love.World
+---@return number n The number of contacts in the world.
 function World:getContactCount() end
 
 ---Returns the function for collision filtering.
 ---
----[Open in Browser](https://love2d.org/wiki/World.getContactFilter)
+---[Open in Browser](https://love2d.org/wiki/World:getContactFilter)
 ---
----@return function
+---@param self love.World
+---@return function contactFilter The function that handles the contact filtering.
 function World:getContactFilter() end
 
 ---Returns a table with all Contacts.
 ---
----[Open in Browser](https://love2d.org/wiki/World.getContacts)
+---[Open in Browser](https://love2d.org/wiki/World:getContacts)
 ---
----@return table
+---@param self love.World
+---@return love.Contact[] contacts A sequence with all Contacts.
 function World:getContacts() end
 
 ---Get the gravity of the world.
 ---
----[Open in Browser](https://love2d.org/wiki/World.getGravity)
+---[Open in Browser](https://love2d.org/wiki/World:getGravity)
 ---
----@return number, number
+---@param self love.World
+---@return number x The x component of gravity.
+---@return number y The y component of gravity.
 function World:getGravity() end
 
 ---Returns the number of joints in the world.
 ---
----[Open in Browser](https://love2d.org/wiki/World.getJointCount)
+---[Open in Browser](https://love2d.org/wiki/World:getJointCount)
 ---
----@return number
+---@param self love.World
+---@return number n The number of joints in the world.
 function World:getJointCount() end
 
 ---Returns a table with all joints.
 ---
----[Open in Browser](https://love2d.org/wiki/World.getJoints)
+---[Open in Browser](https://love2d.org/wiki/World:getJoints)
 ---
----@return table
+---@param self love.World
+---@return love.Joint[] joints A sequence with all joints.
 function World:getJoints() end
 
 ---Gets whether the World is destroyed. Destroyed worlds cannot be used.
 ---
----[Open in Browser](https://love2d.org/wiki/World.isDestroyed)
+---[Open in Browser](https://love2d.org/wiki/World:isDestroyed)
 ---
----@return boolean
+---@param self love.World
+---@return boolean destroyed Whether the World is destroyed.
 function World:isDestroyed() end
 
 ---Returns if the world is updating its state.
 ---
 ---This will return true inside the callbacks from World:setCallbacks.
 ---
----[Open in Browser](https://love2d.org/wiki/World.isLocked)
+---[Open in Browser](https://love2d.org/wiki/World:isLocked)
 ---
----@return boolean
+---@param self love.World
+---@return boolean locked Will be true if the world is in the process of updating its state.
 function World:isLocked() end
 
 ---Gets the sleep behaviour of the world.
 ---
----[Open in Browser](https://love2d.org/wiki/World.isSleepingAllowed)
+---[Open in Browser](https://love2d.org/wiki/World:isSleepingAllowed)
 ---
----@return boolean
+---@param self love.World
+---@return boolean allow True if bodies in the world are allowed to sleep, or false if not.
 function World:isSleepingAllowed() end
 
 ---Calls a function for each fixture inside the specified area by searching for any overlapping bounding box (Fixture:getBoundingBox).
 ---
----[Open in Browser](https://love2d.org/wiki/World.queryBoundingBox)
+---[Open in Browser](https://love2d.org/wiki/World:queryBoundingBox)
 ---
----@param topLeftX number # The x position of the top-left point.
----@param topLeftY number # The y position of the top-left point.
----@param bottomRightX number # The x position of the bottom-right point.
----@param bottomRightY number # The y position of the bottom-right point.
----@param callback function # This function gets passed one argument, the fixture, and should return a boolean. The search will continue if it is true or stop if it is false.
+---@param self love.World
+---@param topLeftX number The x position of the top-left point.
+---@param topLeftY number The y position of the top-left point.
+---@param bottomRightX number The x position of the bottom-right point.
+---@param bottomRightY number The y position of the bottom-right point.
+---@param callback fun(...) This function gets passed one argument, the fixture, and should return a boolean. The search will continue if it is true or stop if it is false.
 function World:queryBoundingBox(topLeftX, topLeftY, bottomRightX, bottomRightY, callback) end
 
 ---Casts a ray and calls a function for each fixtures it intersects. 
 ---
----[Open in Browser](https://love2d.org/wiki/World.rayCast)
+---[Open in Browser](https://love2d.org/wiki/World:rayCast)
 ---
----@param x1 number # The x position of the starting point of the ray.
----@param y1 number # The x position of the starting point of the ray.
----@param x2 number # The x position of the end point of the ray.
----@param y2 number # The x value of the surface normal vector of the shape edge.
----@param callback function # A function called for each fixture intersected by the ray. The function gets six arguments and should return a number as a control value. The intersection points fed into the function will be in an arbitrary order. If you wish to find the closest point of intersection, you'll need to do that yourself within the function. The easiest way to do that is by using the fraction value.
+---There is a bug in LÖVE 0.8.0 where the normal vector passed to the callback function gets scaled by love.physics.getMeter.
+---@param self love.World
+---@param x1 number The x position of the starting point of the ray.
+---@param y1 number The x position of the starting point of the ray.
+---@param x2 number The x position of the end point of the ray.
+---@param y2 number The x value of the surface normal vector of the shape edge.
+---@param callback fun(...) A function called for each fixture intersected by the ray. The function gets six arguments and should return a number as a control value. The intersection points fed into the function will be in an arbitrary order. If you wish to find the closest point of intersection, you'll need to do that yourself within the function. The easiest way to do that is by using the fraction value.
 function World:rayCast(x1, y1, x2, y2, callback) end
 
 ---Sets functions for the collision callbacks during the world update.
@@ -2227,98 +2574,108 @@ function World:rayCast(x1, y1, x2, y2, callback) end
 ---
 ---If you are interested to know when exactly each callback is called, consult a Box2d manual
 ---
----[Open in Browser](https://love2d.org/wiki/World.setCallbacks)
+---[Open in Browser](https://love2d.org/wiki/World:setCallbacks)
 ---
----@param beginContact function # Gets called when two fixtures begin to overlap.
----@param endContact function # Gets called when two fixtures cease to overlap. This will also be called outside of a world update, when colliding objects are destroyed.
----@param preSolve function? # Gets called before a collision gets resolved. (Defaults to nil.)
----@param postSolve function? # Gets called after the collision has been resolved. (Defaults to nil.)
+---@param self love.World
+---@param beginContact fun(...) Gets called when two fixtures begin to overlap.
+---@param endContact fun(...) Gets called when two fixtures cease to overlap. This will also be called outside of a world update, when colliding objects are destroyed.
+---@param preSolve fun(...)? Gets called before a collision gets resolved. (defaults to `nil`.)
+---@param postSolve fun(...)? Gets called after the collision has been resolved. (defaults to `nil`.)
 function World:setCallbacks(beginContact, endContact, preSolve, postSolve) end
 
 ---Sets a function for collision filtering.
 ---
 ---If the group and category filtering doesn't generate a collision decision, this function gets called with the two fixtures as arguments. The function should return a boolean value where true means the fixtures will collide and false means they will pass through each other.
 ---
----[Open in Browser](https://love2d.org/wiki/World.setContactFilter)
+---[Open in Browser](https://love2d.org/wiki/World:setContactFilter)
 ---
----@param filter function # The function handling the contact filtering.
+---@param self love.World
+---@param filter fun(...) The function handling the contact filtering.
 function World:setContactFilter(filter) end
 
 ---Set the gravity of the world.
 ---
----[Open in Browser](https://love2d.org/wiki/World.setGravity)
+---[Open in Browser](https://love2d.org/wiki/World:setGravity)
 ---
----@param x number # The x component of gravity.
----@param y number # The y component of gravity.
+---@param self love.World
+---@param x number The x component of gravity.
+---@param y number The y component of gravity.
 function World:setGravity(x, y) end
 
 ---Sets the sleep behaviour of the world.
 ---
----[Open in Browser](https://love2d.org/wiki/World.setSleepingAllowed)
+---[Open in Browser](https://love2d.org/wiki/World:setSleepingAllowed)
 ---
----@param allow boolean # True if bodies in the world are allowed to sleep, or false if not.
+---@param self love.World
+---@param allow boolean True if bodies in the world are allowed to sleep, or false if not.
 function World:setSleepingAllowed(allow) end
 
 ---Translates the World's origin. Useful in large worlds where floating point precision issues become noticeable at far distances from the origin.
 ---
----[Open in Browser](https://love2d.org/wiki/World.translateOrigin)
+---[Open in Browser](https://love2d.org/wiki/World:translateOrigin)
 ---
----@param x number # The x component of the new origin with respect to the old origin.
----@param y number # The y component of the new origin with respect to the old origin.
+---@param self love.World
+---@param x number The x component of the new origin with respect to the old origin.
+---@param y number The y component of the new origin with respect to the old origin.
 function World:translateOrigin(x, y) end
 
 ---Update the state of the world.
 ---
----[Open in Browser](https://love2d.org/wiki/World.update)
+---[Open in Browser](https://love2d.org/wiki/World:update)
 ---
----@param dt number # The time (in seconds) to advance the physics simulation.
----@param velocityiterations number? # The maximum number of steps used to determine the new velocities when resolving a collision. (Defaults to 8.)
----@param positioniterations number? # The maximum number of steps used to determine the new positions when resolving a collision. (Defaults to 3.)
+---@param self love.World
+---@param dt number The time (in seconds) to advance the physics simulation.
+---@param velocityiterations number? The maximum number of steps used to determine the new velocities when resolving a collision. (defaults to `8`.)
+---@param positioniterations number? The maximum number of steps used to determine the new positions when resolving a collision. (defaults to `3`.)
 function World:update(dt, velocityiterations, positioniterations) end
 
---endregion World
+--endregion love.World
 
 ---The types of a Body. 
 ---
 ---[Open in Browser](https://love2d.org/wiki/BodyType)
 ---
----@alias BodyType
----| "static" -- Static bodies do not move.
----| "dynamic" -- Dynamic bodies collide with all bodies.
----| "kinematic" -- Kinematic bodies only collide with dynamic bodies.
+---@alias love.BodyType
+---| "static" # Static bodies do not move.
+---| "dynamic" # Dynamic bodies collide with all bodies.
+---| "kinematic" # Kinematic bodies only collide with dynamic bodies.
 
 ---Different types of joints.
 ---
 ---[Open in Browser](https://love2d.org/wiki/JointType)
 ---
----@alias JointType
----| "distance" -- A DistanceJoint.
----| "friction" -- A FrictionJoint.
----| "gear" -- A GearJoint.
----| "mouse" -- A MouseJoint.
----| "prismatic" -- A PrismaticJoint.
----| "pulley" -- A PulleyJoint.
----| "revolute" -- A RevoluteJoint.
----| "rope" -- A RopeJoint.
----| "weld" -- A WeldJoint.
+---@alias love.JointType
+---| "distance" # A DistanceJoint.
+---| "friction" # A FrictionJoint.
+---| "gear" # A GearJoint.
+---| "mouse" # A MouseJoint.
+---| "prismatic" # A PrismaticJoint.
+---| "pulley" # A PulleyJoint.
+---| "revolute" # A RevoluteJoint.
+---| "rope" # A RopeJoint.
+---| "weld" # A WeldJoint.
 
 ---The different types of Shapes, as returned by Shape:getType.
 ---
 ---[Open in Browser](https://love2d.org/wiki/ShapeType)
 ---
----@alias ShapeType
----| "circle" -- The Shape is a CircleShape.
----| "polygon" -- The Shape is a PolygonShape.
----| "edge" -- The Shape is a EdgeShape.
----| "chain" -- The Shape is a ChainShape.
+---@alias love.ShapeType
+---| "circle" # The Shape is a CircleShape.
+---| "polygon" # The Shape is a PolygonShape.
+---| "edge" # The Shape is a EdgeShape.
+---| "chain" # The Shape is a ChainShape.
 
 ---Returns the two closest points between two fixtures and their distance.
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.physics.getDistance)
 ---
----@param fixture1 love.Fixture # The first fixture.
----@param fixture2 love.Fixture # The second fixture.
----@return number, number, number, number, number
+---@param fixture1 love.Fixture The first fixture.
+---@param fixture2 love.Fixture The second fixture.
+---@return number distance The distance of the two points.
+---@return number x1 The x-coordinate of the first point.
+---@return number y1 The y-coordinate of the first point.
+---@return number x2 The x-coordinate of the second point.
+---@return number y2 The y-coordinate of the second point.
 function love.physics.getDistance(fixture1, fixture2) end
 
 ---Returns the meter scale factor.
@@ -2329,7 +2686,7 @@ function love.physics.getDistance(fixture1, fixture2) end
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.physics.getMeter)
 ---
----@return number
+---@return number scale The scale factor as an integer.
 function love.physics.getMeter() end
 
 ---Creates a new body.
@@ -2346,36 +2703,35 @@ function love.physics.getMeter() end
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.physics.newBody)
 ---
----@param world love.World # The world to create the body in.
----@param x number? # The x position of the body. (Defaults to 0.)
----@param y number? # The y position of the body. (Defaults to 0.)
----@param type love.BodyType? # The type of the body. (Defaults to 'static'.)
----@return love.Body
+---@param world love.World The world to create the body in.
+---@param x number? The x position of the body. (defaults to `0`.)
+---@param y number? The y position of the body. (defaults to `0`.)
+---@param type love.BodyType? The type of the body. (defaults to `'static'`.)
+---@return love.Body body A new body.
 function love.physics.newBody(world, x, y, type) end
 
 ---Creates a new ChainShape.
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.physics.newChainShape)
 ---
----@param loop boolean # If the chain should loop back to the first point.
----@param x1 number # The x position of the first point.
----@param y1 number # The y position of the first point.
----@param x2 number # The x position of the second point.
----@param y2 number # The y position of the second point.
----@vararg number # Additional point positions.
----@return love.ChainShape
----@overload fun(loop:boolean, points:table):love.ChainShape
+---@param loop boolean If the chain should loop back to the first point.
+---@param x1 number The x position of the first point.
+---@param y1 number The y position of the first point.
+---@param x2 number The x position of the second point.
+---@param y2 number The y position of the second point.
+---@return love.ChainShape shape The new shape.
+---@overload fun(loop: boolean, points: table): love.ChainShape
 function love.physics.newChainShape(loop, x1, y1, x2, y2, ...) end
 
 ---Creates a new CircleShape.
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.physics.newCircleShape)
 ---
----@param x number # The x position of the circle.
----@param y number # The y position of the circle.
----@param radius number # The radius of the circle.
----@return love.CircleShape
----@overload fun(radius:number):love.CircleShape
+---@param x number The x position of the circle.
+---@param y number The y position of the circle.
+---@param radius number The radius of the circle.
+---@return love.CircleShape shape The new shape.
+---@overload fun(radius: number): love.CircleShape
 function love.physics.newCircleShape(x, y, radius) end
 
 ---Creates a DistanceJoint between two bodies.
@@ -2384,25 +2740,25 @@ function love.physics.newCircleShape(x, y, radius) end
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.physics.newDistanceJoint)
 ---
----@param body1 love.Body # The first body to attach to the joint.
----@param body2 love.Body # The second body to attach to the joint.
----@param x1 number # The x position of the first anchor point (world space).
----@param y1 number # The y position of the first anchor point (world space).
----@param x2 number # The x position of the second anchor point (world space).
----@param y2 number # The y position of the second anchor point (world space).
----@param collideConnected boolean? # Specifies whether the two bodies should collide with each other. (Defaults to false.)
----@return love.DistanceJoint
+---@param body1 love.Body The first body to attach to the joint.
+---@param body2 love.Body The second body to attach to the joint.
+---@param x1 number The x position of the first anchor point (world space).
+---@param y1 number The y position of the first anchor point (world space).
+---@param x2 number The x position of the second anchor point (world space).
+---@param y2 number The y position of the second anchor point (world space).
+---@param collideConnected boolean? Specifies whether the two bodies should collide with each other. (defaults to `false`.)
+---@return love.DistanceJoint joint The new distance joint.
 function love.physics.newDistanceJoint(body1, body2, x1, y1, x2, y2, collideConnected) end
 
 ---Creates a new EdgeShape.
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.physics.newEdgeShape)
 ---
----@param x1 number # The x position of the first point.
----@param y1 number # The y position of the first point.
----@param x2 number # The x position of the second point.
----@param y2 number # The y position of the second point.
----@return love.EdgeShape
+---@param x1 number The x position of the first point.
+---@param y1 number The y position of the first point.
+---@param x2 number The x position of the second point.
+---@param y2 number The y position of the second point.
+---@return love.EdgeShape shape The new shape.
 function love.physics.newEdgeShape(x1, y1, x2, y2) end
 
 ---Creates and attaches a Fixture to a body.
@@ -2411,25 +2767,25 @@ function love.physics.newEdgeShape(x1, y1, x2, y2) end
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.physics.newFixture)
 ---
----@param body love.Body # The body which gets the fixture attached.
----@param shape love.Shape # The shape to be copied to the fixture.
----@param density number? # The density of the fixture. (Defaults to 1.)
----@return love.Fixture
+---@param body love.Body The body which gets the fixture attached.
+---@param shape love.Shape The shape to be copied to the fixture.
+---@param density number? The density of the fixture. (defaults to `1`.)
+---@return love.Fixture fixture The new fixture.
 function love.physics.newFixture(body, shape, density) end
 
 ---Create a friction joint between two bodies. A FrictionJoint applies friction to a body.
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.physics.newFrictionJoint)
 ---
----@param body1 love.Body # The first body to attach to the joint.
----@param body2 love.Body # The second body to attach to the joint.
----@param x1 number # The x position of the first anchor point.
----@param y1 number # The y position of the first anchor point.
----@param x2 number # The x position of the second anchor point.
----@param y2 number # The y position of the second anchor point.
----@param collideConnected boolean? # Specifies whether the two bodies should collide with each other. (Defaults to false.)
----@return love.FrictionJoint
----@overload fun(body1:love.Body, body2:love.Body, x:number, y:number, collideConnected:boolean?):love.FrictionJoint
+---@param body1 love.Body The first body to attach to the joint.
+---@param body2 love.Body The second body to attach to the joint.
+---@param x1 number The x position of the first anchor point.
+---@param y1 number The y position of the first anchor point.
+---@param x2 number The x position of the second anchor point.
+---@param y2 number The y position of the second anchor point.
+---@param collideConnected boolean? Specifies whether the two bodies should collide with each other. (defaults to `false`.)
+---@return love.FrictionJoint joint The new FrictionJoint.
+---@overload fun(body1: love.Body, body2: love.Body, x: number, y: number, collideConnected: boolean?): love.FrictionJoint
 function love.physics.newFrictionJoint(body1, body2, x1, y1, x2, y2, collideConnected) end
 
 ---Create a GearJoint connecting two Joints.
@@ -2440,11 +2796,11 @@ function love.physics.newFrictionJoint(body1, body2, x1, y1, x2, y2, collideConn
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.physics.newGearJoint)
 ---
----@param joint1 love.Joint # The first joint to connect with a gear joint.
----@param joint2 love.Joint # The second joint to connect with a gear joint.
----@param ratio number? # The gear ratio. (Defaults to 1.)
----@param collideConnected boolean? # Specifies whether the two bodies should collide with each other. (Defaults to false.)
----@return love.GearJoint
+---@param joint1 love.Joint The first joint to connect with a gear joint.
+---@param joint2 love.Joint The second joint to connect with a gear joint.
+---@param ratio number? The gear ratio. (defaults to `1`.)
+---@param collideConnected boolean? Specifies whether the two bodies should collide with each other. (defaults to `false`.)
+---@return love.GearJoint joint The new gear joint.
 function love.physics.newGearJoint(joint1, joint2, ratio, collideConnected) end
 
 ---Creates a joint between two bodies which controls the relative motion between them.
@@ -2453,12 +2809,12 @@ function love.physics.newGearJoint(joint1, joint2, ratio, collideConnected) end
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.physics.newMotorJoint)
 ---
----@param body1 love.Body # The first body to attach to the joint.
----@param body2 love.Body # The second body to attach to the joint.
----@param correctionFactor number? # The joint's initial position correction factor, in the range of 1. (Defaults to 0.3.)
----@param collideConnected boolean? # Specifies whether the two bodies should collide with each other. (Defaults to false.)
----@return love.MotorJoint
----@overload fun(body1:love.Body, body2:love.Body, correctionFactor:number?):love.MotorJoint
+---@param body1 love.Body The first body to attach to the joint.
+---@param body2 love.Body The second body to attach to the joint.
+---@param correctionFactor number? The joint's initial position correction factor, in the range of 1. (defaults to `0.3`.)
+---@param collideConnected boolean? Specifies whether the two bodies should collide with each other. (defaults to `false`.)
+---@return love.MotorJoint joint The new MotorJoint.
+---@overload fun(body1: love.Body, body2: love.Body, correctionFactor: number?): love.MotorJoint
 function love.physics.newMotorJoint(body1, body2, correctionFactor, collideConnected) end
 
 ---Create a joint between a body and the mouse.
@@ -2469,10 +2825,10 @@ function love.physics.newMotorJoint(body1, body2, correctionFactor, collideConne
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.physics.newMouseJoint)
 ---
----@param body love.Body # The body to attach to the mouse.
----@param x number # The x position of the connecting point.
----@param y number # The y position of the connecting point.
----@return love.MouseJoint
+---@param body love.Body The body to attach to the mouse.
+---@param x number The x position of the connecting point.
+---@param y number The y position of the connecting point.
+---@return love.MouseJoint joint The new mouse joint.
 function love.physics.newMouseJoint(body, x, y) end
 
 ---Creates a new PolygonShape.
@@ -2481,15 +2837,14 @@ function love.physics.newMouseJoint(body, x, y) end
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.physics.newPolygonShape)
 ---
----@param x1 number # The x position of the first point.
----@param y1 number # The y position of the first point.
----@param x2 number # The x position of the second point.
----@param y2 number # The y position of the second point.
----@param x3 number # The x position of the third point.
----@param y3 number # The y position of the third point.
----@vararg number # You can continue passing more point positions to create the PolygonShape.
----@return love.PolygonShape
----@overload fun(vertices:table):love.PolygonShape
+---@param x1 number The x position of the first point.
+---@param y1 number The y position of the first point.
+---@param x2 number The x position of the second point.
+---@param y2 number The y position of the second point.
+---@param x3 number The x position of the third point.
+---@param y3 number The y position of the third point.
+---@return love.PolygonShape shape A new PolygonShape.
+---@overload fun(vertices: table): love.PolygonShape
 function love.physics.newPolygonShape(x1, y1, x2, y2, x3, y3, ...) end
 
 ---Creates a PrismaticJoint between two bodies.
@@ -2498,19 +2853,19 @@ function love.physics.newPolygonShape(x1, y1, x2, y2, x3, y3, ...) end
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.physics.newPrismaticJoint)
 ---
----@param body1 love.Body # The first body to connect with a prismatic joint.
----@param body2 love.Body # The second body to connect with a prismatic joint.
----@param x1 number # The x coordinate of the first anchor point.
----@param y1 number # The y coordinate of the first anchor point.
----@param x2 number # The x coordinate of the second anchor point.
----@param y2 number # The y coordinate of the second anchor point.
----@param ax number # The x coordinate of the axis unit vector.
----@param ay number # The y coordinate of the axis unit vector.
----@param collideConnected boolean? # Specifies whether the two bodies should collide with each other. (Defaults to false.)
----@param referenceAngle number? # The reference angle between body1 and body2, in radians. (Defaults to 0.)
----@return love.PrismaticJoint
----@overload fun(body1:love.Body, body2:love.Body, x1:number, y1:number, x2:number, y2:number, ax:number, ay:number, collideConnected:boolean?):love.PrismaticJoint
----@overload fun(body1:love.Body, body2:love.Body, x:number, y:number, ax:number, ay:number, collideConnected:boolean?):love.PrismaticJoint
+---@param body1 love.Body The first body to connect with a prismatic joint.
+---@param body2 love.Body The second body to connect with a prismatic joint.
+---@param x1 number The x coordinate of the first anchor point.
+---@param y1 number The y coordinate of the first anchor point.
+---@param x2 number The x coordinate of the second anchor point.
+---@param y2 number The y coordinate of the second anchor point.
+---@param ax number The x coordinate of the axis unit vector.
+---@param ay number The y coordinate of the axis unit vector.
+---@param collideConnected boolean? Specifies whether the two bodies should collide with each other. (defaults to `false`.)
+---@param referenceAngle number? The reference angle between body1 and body2, in radians. (defaults to `0`.)
+---@return love.PrismaticJoint joint The new prismatic joint.
+---@overload fun(body1: love.Body, body2: love.Body, x1: number, y1: number, x2: number, y2: number, ax: number, ay: number, collideConnected: boolean?): love.PrismaticJoint
+---@overload fun(body1: love.Body, body2: love.Body, x: number, y: number, ax: number, ay: number, collideConnected: boolean?): love.PrismaticJoint
 function love.physics.newPrismaticJoint(body1, body2, x1, y1, x2, y2, ax, ay, collideConnected, referenceAngle) end
 
 ---Creates a PulleyJoint to join two bodies to each other and the ground.
@@ -2521,19 +2876,19 @@ function love.physics.newPrismaticJoint(body1, body2, x1, y1, x2, y2, ax, ay, co
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.physics.newPulleyJoint)
 ---
----@param body1 love.Body # The first body to connect with a pulley joint.
----@param body2 love.Body # The second body to connect with a pulley joint.
----@param gx1 number # The x coordinate of the first body's ground anchor.
----@param gy1 number # The y coordinate of the first body's ground anchor.
----@param gx2 number # The x coordinate of the second body's ground anchor.
----@param gy2 number # The y coordinate of the second body's ground anchor.
----@param x1 number # The x coordinate of the pulley joint anchor in the first body.
----@param y1 number # The y coordinate of the pulley joint anchor in the first body.
----@param x2 number # The x coordinate of the pulley joint anchor in the second body.
----@param y2 number # The y coordinate of the pulley joint anchor in the second body.
----@param ratio number? # The joint ratio. (Defaults to 1.)
----@param collideConnected boolean? # Specifies whether the two bodies should collide with each other. (Defaults to true.)
----@return love.PulleyJoint
+---@param body1 love.Body The first body to connect with a pulley joint.
+---@param body2 love.Body The second body to connect with a pulley joint.
+---@param gx1 number The x coordinate of the first body's ground anchor.
+---@param gy1 number The y coordinate of the first body's ground anchor.
+---@param gx2 number The x coordinate of the second body's ground anchor.
+---@param gy2 number The y coordinate of the second body's ground anchor.
+---@param x1 number The x coordinate of the pulley joint anchor in the first body.
+---@param y1 number The y coordinate of the pulley joint anchor in the first body.
+---@param x2 number The x coordinate of the pulley joint anchor in the second body.
+---@param y2 number The y coordinate of the pulley joint anchor in the second body.
+---@param ratio number? The joint ratio. (defaults to `1`.)
+---@param collideConnected boolean? Specifies whether the two bodies should collide with each other. (defaults to `true`.)
+---@return love.PulleyJoint joint The new pulley joint.
 function love.physics.newPulleyJoint(body1, body2, gx1, gy1, gx2, gy2, x1, y1, x2, y2, ratio, collideConnected) end
 
 ---Shorthand for creating rectangular PolygonShapes. 
@@ -2542,13 +2897,13 @@ function love.physics.newPulleyJoint(body1, body2, gx1, gy1, gx2, gy2, x1, y1, x
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.physics.newRectangleShape)
 ---
----@param x number # The offset along the x-axis.
----@param y number # The offset along the y-axis.
----@param width number # The width of the rectangle.
----@param height number # The height of the rectangle.
----@param angle number? # The initial angle of the rectangle. (Defaults to 0.)
----@return love.PolygonShape
----@overload fun(width:number, height:number):love.PolygonShape
+---@param x number The offset along the x-axis.
+---@param y number The offset along the y-axis.
+---@param width number The width of the rectangle.
+---@param height number The height of the rectangle.
+---@param angle number? The initial angle of the rectangle. (defaults to `0`.)
+---@return love.PolygonShape shape A new PolygonShape.
+---@overload fun(width: number, height: number): love.PolygonShape
 function love.physics.newRectangleShape(x, y, width, height, angle) end
 
 ---Creates a pivot joint between two bodies.
@@ -2557,75 +2912,75 @@ function love.physics.newRectangleShape(x, y, width, height, angle) end
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.physics.newRevoluteJoint)
 ---
----@param body1 love.Body # The first body.
----@param body2 love.Body # The second body.
----@param x1 number # The x position of the first connecting point.
----@param y1 number # The y position of the first connecting point.
----@param x2 number # The x position of the second connecting point.
----@param y2 number # The y position of the second connecting point.
----@param collideConnected boolean? # Specifies whether the two bodies should collide with each other. (Defaults to false.)
----@param referenceAngle number? # The reference angle between body1 and body2, in radians. (Defaults to 0.)
----@return love.RevoluteJoint
----@overload fun(body1:love.Body, body2:love.Body, x:number, y:number, collideConnected:boolean?):love.RevoluteJoint
+---@param body1 love.Body The first body.
+---@param body2 love.Body The second body.
+---@param x1 number The x position of the first connecting point.
+---@param y1 number The y position of the first connecting point.
+---@param x2 number The x position of the second connecting point.
+---@param y2 number The y position of the second connecting point.
+---@param collideConnected boolean? Specifies whether the two bodies should collide with each other. (defaults to `false`.)
+---@param referenceAngle number? The reference angle between body1 and body2, in radians. (defaults to `0`.)
+---@return love.RevoluteJoint joint The new revolute joint.
+---@overload fun(body1: love.Body, body2: love.Body, x: number, y: number, collideConnected: boolean?): love.RevoluteJoint
 function love.physics.newRevoluteJoint(body1, body2, x1, y1, x2, y2, collideConnected, referenceAngle) end
 
 ---Creates a joint between two bodies. Its only function is enforcing a max distance between these bodies.
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.physics.newRopeJoint)
 ---
----@param body1 love.Body # The first body to attach to the joint.
----@param body2 love.Body # The second body to attach to the joint.
----@param x1 number # The x position of the first anchor point.
----@param y1 number # The y position of the first anchor point.
----@param x2 number # The x position of the second anchor point.
----@param y2 number # The y position of the second anchor point.
----@param maxLength number # The maximum distance for the bodies.
----@param collideConnected boolean? # Specifies whether the two bodies should collide with each other. (Defaults to false.)
----@return love.RopeJoint
+---@param body1 love.Body The first body to attach to the joint.
+---@param body2 love.Body The second body to attach to the joint.
+---@param x1 number The x position of the first anchor point.
+---@param y1 number The y position of the first anchor point.
+---@param x2 number The x position of the second anchor point.
+---@param y2 number The y position of the second anchor point.
+---@param maxLength number The maximum distance for the bodies.
+---@param collideConnected boolean? Specifies whether the two bodies should collide with each other. (defaults to `false`.)
+---@return love.RopeJoint joint The new RopeJoint.
 function love.physics.newRopeJoint(body1, body2, x1, y1, x2, y2, maxLength, collideConnected) end
 
 ---Creates a constraint joint between two bodies. A WeldJoint essentially glues two bodies together. The constraint is a bit soft, however, due to Box2D's iterative solver.
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.physics.newWeldJoint)
 ---
----@param body1 love.Body # The first body to attach to the joint.
----@param body2 love.Body # The second body to attach to the joint.
----@param x1 number # The x position of the first anchor point (world space).
----@param y1 number # The y position of the first anchor point  (world space).
----@param x2 number # The x position of the second anchor point (world space).
----@param y2 number # The y position of the second anchor point (world space).
----@param collideConnected boolean? # Specifies whether the two bodies should collide with each other. (Defaults to false.)
----@param referenceAngle number? # The reference angle between body1 and body2, in radians. (Defaults to 0.)
----@return love.WeldJoint
----@overload fun(body1:love.Body, body2:love.Body, x1:number, y1:number, x2:number, y2:number, collideConnected:boolean?):love.WeldJoint
----@overload fun(body1:love.Body, body2:love.Body, x:number, y:number, collideConnected:boolean?):love.WeldJoint
+---@param body1 love.Body The first body to attach to the joint.
+---@param body2 love.Body The second body to attach to the joint.
+---@param x1 number The x position of the first anchor point (world space).
+---@param y1 number The y position of the first anchor point  (world space).
+---@param x2 number The x position of the second anchor point (world space).
+---@param y2 number The y position of the second anchor point (world space).
+---@param collideConnected boolean? Specifies whether the two bodies should collide with each other. (defaults to `false`.)
+---@param referenceAngle number? The reference angle between body1 and body2, in radians. (defaults to `0`.)
+---@return love.WeldJoint joint The new WeldJoint.
+---@overload fun(body1: love.Body, body2: love.Body, x1: number, y1: number, x2: number, y2: number, collideConnected: boolean?): love.WeldJoint
+---@overload fun(body1: love.Body, body2: love.Body, x: number, y: number, collideConnected: boolean?): love.WeldJoint
 function love.physics.newWeldJoint(body1, body2, x1, y1, x2, y2, collideConnected, referenceAngle) end
 
 ---Creates a wheel joint.
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.physics.newWheelJoint)
 ---
----@param body1 love.Body # The first body.
----@param body2 love.Body # The second body.
----@param x1 number # The x position of the first anchor point.
----@param y1 number # The y position of the first anchor point.
----@param x2 number # The x position of the second anchor point.
----@param y2 number # The y position of the second anchor point.
----@param ax number # The x position of the axis unit vector.
----@param ay number # The y position of the axis unit vector.
----@param collideConnected boolean? # Specifies whether the two bodies should collide with each other. (Defaults to false.)
----@return love.WheelJoint
----@overload fun(body1:love.Body, body2:love.Body, x:number, y:number, ax:number, ay:number, collideConnected:boolean?):love.WheelJoint
+---@param body1 love.Body The first body.
+---@param body2 love.Body The second body.
+---@param x1 number The x position of the first anchor point.
+---@param y1 number The y position of the first anchor point.
+---@param x2 number The x position of the second anchor point.
+---@param y2 number The y position of the second anchor point.
+---@param ax number The x position of the axis unit vector.
+---@param ay number The y position of the axis unit vector.
+---@param collideConnected boolean? Specifies whether the two bodies should collide with each other. (defaults to `false`.)
+---@return love.WheelJoint joint The new WheelJoint.
+---@overload fun(body1: love.Body, body2: love.Body, x: number, y: number, ax: number, ay: number, collideConnected: boolean?): love.WheelJoint
 function love.physics.newWheelJoint(body1, body2, x1, y1, x2, y2, ax, ay, collideConnected) end
 
 ---Creates a new World.
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.physics.newWorld)
 ---
----@param xg number? # The x component of gravity. (Defaults to 0.)
----@param yg number? # The y component of gravity. (Defaults to 0.)
----@param sleep boolean? # Whether the bodies in this world are allowed to sleep. (Defaults to true.)
----@return love.World
+---@param xg number The x component of gravity. (defaults to `0`.)
+---@param yg number? The y component of gravity. (defaults to `0`.)
+---@param sleep boolean? Whether the bodies in this world are allowed to sleep. (defaults to `true`.)
+---@return love.World world A brave new World.
 function love.physics.newWorld(xg, yg, sleep) end
 
 ---Sets the pixels to meter scale factor.
@@ -2636,6 +2991,6 @@ function love.physics.newWorld(xg, yg, sleep) end
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.physics.setMeter)
 ---
----@param scale number # The scale factor as an integer.
+---@param scale number The scale factor as an integer.
 function love.physics.setMeter(scale) end
 

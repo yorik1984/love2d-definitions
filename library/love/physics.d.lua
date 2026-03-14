@@ -263,7 +263,7 @@ function Body:getLocalPoint(worldX, worldY) end
 ---@return number y1 (Result) The transformed y position of the first point.
 ---@return number x2 (Result) The transformed x position of the second point.
 ---@return number y2 (Result) The transformed y position of the second point.
----@return number (Result) Additional transformed x and y position of the points.
+---@return number # (Result) Additional transformed x and y position of the points.
 function Body:getLocalPoints(x1, y1, x2, y2, ...) end
 
 ---Transform a vector from world coordinates to local coordinates.
@@ -1128,7 +1128,7 @@ function Fixture:getBoundingBox(index) end
 ---[Open in Browser](https://love2d.org/wiki/Fixture:getCategory)
 ---
 ---@param self love.Fixture
----@return number The categories.
+---@return number # The categories.
 function Fixture:getCategory() end
 
 ---Returns the density of the fixture.
@@ -1174,7 +1174,7 @@ function Fixture:getGroupIndex() end
 ---[Open in Browser](https://love2d.org/wiki/Fixture:getMask)
 ---
 ---@param self love.Fixture
----@return number The masks.
+---@return number # The masks.
 function Fixture:getMask() end
 
 ---Returns the mass, its center and the rotational inertia.

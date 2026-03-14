@@ -1545,6 +1545,10 @@ local function genFunction(moduleName, fun, static)
                     if rDesc == "" and r.name == "..." then
                         rName = " " .. r.name
                     end
+
+                    -- Described Function Return
+                    rName = rName ~= "" and rName or " #"
+
                     -- If there is a class for this return, append reference in comment
                     if rClassName then
                         rDesc = rDesc .. " See class `" .. rClassName .. "` for field descriptions."

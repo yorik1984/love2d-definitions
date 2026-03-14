@@ -201,7 +201,7 @@ function love.data.pack(container, format, v1, ...) end
 ---@param datastring string A string containing the packed (serialized) data.
 ---@param pos number? Where to start reading in the string. Negative values can be used to read relative from the end of the string. (defaults to `1`).
 ---@return number|boolean|string v1 The first value (number, boolean, or string) that was unpacked.
----@return number|boolean|string Additional unpacked values.
+---@return number|boolean|string # Additional unpacked values.
 ---@return number index The index of the first unread byte in the data string.
 ---Unpacking integers with values greater than 2^52 is not supported, as Lua 5.1 cannot represent those values in its number type. 
 ---@overload fun(format: string, data: love.Data, pos: number?): number|boolean|string, number|boolean|string, number

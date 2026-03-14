@@ -411,7 +411,7 @@ function Mesh:getVertex(index) end
 ---@param attributeindex number The index of the attribute within the vertex to be retrieved (one-based).
 ---@return number value1 The value of the first component of the attribute.
 ---@return number value2 The value of the second component of the attribute.
----@return number Any additional vertex attribute components.
+---@return number # Any additional vertex attribute components.
 function Mesh:getVertexAttribute(vertexindex, attributeindex) end
 
 ---Gets the total number of vertices in the Mesh.

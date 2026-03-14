@@ -114,6 +114,6 @@ function love.event.quit(exitstatus) end
 ---@return Variant d Fourth event argument.
 ---@return Variant e Fifth event argument.
 ---@return Variant f Sixth event argument.
----@return Variant Further event arguments may follow.
+---@return Variant # Further event arguments may follow.
 function love.event.wait() end
 

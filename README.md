@@ -1,4 +1,4 @@
-# LuaCATS ♡ LÖVE ♡ Generator
+<h1 align="center">&nbsp;&nbsp; LuaCATS ♡ LÖVE ♡ Definitions&nbsp;&nbsp;</h1>
 
 [![Generate LÖVE LuaCATS API](https://github.com/yorik1984/love2d-definitions/actions/workflows/generate_love_api.yml/badge.svg)](https://github.com/yorik1984/love2d-definitions/actions/workflows/generate_love_api.yml)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/yorik1984/love2d-definitions/blob/main/LICENSE)
@@ -198,25 +198,22 @@ lua genLOVE2dAPI.lua HELP
 
 ## 📚 References & Related Projects
 
-Expand your LÖVE development toolkit with these complementary resources:
-
-#### [love2d-docs.nvim](https://github.com/yorik1984/love2d-docs.nvim) 📘
+### [love2d-docs.nvim](https://github.com/yorik1984/love2d-docs.nvim)
 A comprehensive (Neo)Vim plugin that brings the entire LÖVE framework documentation into your editor with beautiful syntax highlighting.
+Provides complete LÖVE API documentation via `:help`, syntax highlighting for LÖVE functions, modules, types, and callbacks, with full **Treesitter support**.
 
-*   **What it does:** Provides complete LÖVE API documentation via `:help`, syntax highlighting for LÖVE functions, modules, types, and callbacks, with full **Treesitter support**.
-*   **✨ Key Features:**
-    *   **🎨 Dual Editor Support:** Works flawlessly in both **Neovim** (with Treesitter) and **classic Vim**.
-    *   **🤖 Automated Updates:** Uses GitHub Actions to stay in sync with the official love-api, just like this generator.
-    *   **📖 Built-in Help:** Access documentation for any function (e.g., `:help love2d-docs-love.graphics.rectangle`) or type directly from your editor.
-    *   **⚙️ Fully Customizable:** Offers flexible styling options for colors and font styles (bold, italic, etc.) for both Neovim and Vim.
-    *   **📌 Version Branches:** Maintains version-specific branches (e.g., `11.5`) to match different LÖVE releases.
+✨ Key Features:
+  * **🎨 Dual Editor Support:** Works flawlessly in both **Neovim** (with Treesitter) and **Vim**.
+  * **🤖 Automated Updates:** Uses GitHub Actions to stay in sync with the official love-api, just like this generator.
+  * **📖 Built-in Help:** Access documentation for any function (e.g., `:help love2d-docs-love.graphics.rectangle`).
+  * **⚙️ Fully Customizable:** Offers flexible styling options for colors and font styles (bold, italic, etc.) for both Neovim and Vim.
+  * **📌 Version Branches:** Maintains version-specific branches (e.g., `11.5`) to match different LÖVE releases.
 
-> **💡 Pro Tip:** Use **love2d-docs.nvim** alongside this generator for the ultimate LÖVE development setup—get beautiful inline syntax highlighting in your editor *and* intelligent IDE autocompletion from these LuaCATS annotations.
+>[!TIP] Use **love2d-docs.nvim** alongside this definitions for the ultimate LÖVE development setup — get beautiful inline syntax highlighting in your editor and intelligent IDE autocompletion from these LuaCATS annotations.
 
 ## 🙏 Credits
 
-Based on [@NyakoFox](https://github.com/NyakoFox)'s [Emmy-love-api](https://github.com/EmmyLua/Emmy-love-api).
-
+- Based on [@NyakoFox](https://github.com/NyakoFox)'s [EmmyLuaLOVEGenerator](https://github.com/NyakoFox/EmmyLuaLOVEGenerator).
 - [@tangzx](https://github.com/tangzx) - original script
 - [@kindfulkirby](https://github.com/kindfulkirby) - modifications and initial README
 

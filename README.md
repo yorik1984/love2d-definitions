@@ -210,7 +210,7 @@ Provides complete LÖVE API syntax highlighting for LÖVE functions, modules, ty
 
 + **[love2d-docs.nvim](https://github.com/yorik1984/love2d-docs.nvim)**<br>
 Is a comprehensive plugin for [Neovim](https://neovim.io/) and [Vim](https://www.vim.org/) that brings the entire [LÖVE](http://love2d.org) game framework documentation right into your editor.
-    - 📖 **Built-in Help** — Complete LÖVE API documentation accessible via `:help love2d-docs-*`
+    - 📖 **Built-in Help** — Complete LÖVE API documentation accessible via `:help LOVE-*`
 
 + **[love2d-vim-syntax](https://github.com/yorik1984/love2d-vim-syntax)**<br>
 Plugin for [Vim](https://www.vim.org/) that highlight [LÖVE](http://love2d.org) syntax in your editor.

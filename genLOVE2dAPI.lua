@@ -691,12 +691,12 @@ end)
 if not ok then
     io.stderr:write(
         " ❌ Error: could not require '"
-            .. API.FILE
-            .. "'. Make sure "
-            .. API.FILE
-            .. "."
-            .. API.FILE_EXT
-            .. " is present in the current directory\n"
+        .. API.FILE
+        .. "'. Make sure "
+        .. API.FILE
+        .. "."
+        .. API.FILE_EXT
+        .. " is present in the current directory\n"
     )
     os.exit(1)
 elseif debugMode then
@@ -1691,6 +1691,26 @@ local function genType(type)
 end
 
 local function genEnum(enum)
+    local function processString(name)
+        local strRes = "'\"" .. name .. "\"'"
+
+        -- handle special cases where the name itself would break the string literal
+        if name == '"' then
+            strRes = [['\"\"\"']]
+        elseif name == "'" then
+            strRes = [['\"\'\"']]
+        elseif name == "\\" then
+            strRes = [['\"\\\\\"']]
+        end
+
+        -- Escape # as well since it can break the comment formatting
+        if name:find("#") then
+            strRes = "'\"" .. name:gsub("#", "\\35") .. "\"'"
+        end
+
+        return strRes
+    end
+
     local code = ""
     if enum.description then
         code = code .. safeDesc(enum.description) .. "\n"
@@ -1700,7 +1720,8 @@ local function genEnum(enum)
     code = code .. "---\n"
     code = code .. "---@alias " .. API.NAME .. "." .. enum.name .. "\n"
     for _, const in ipairs(enum.constants) do
-        code = code .. "---| '\"" .. const.name .. "\"' # " .. stripNewlines(const.description) .. "\n"
+        local name = tostring(const.name)
+        code = code .. "---| " .. processString(name) .. " # " .. stripNewlines(const.description) .. "\n"
     end
     code = code .. "\n"
     return code

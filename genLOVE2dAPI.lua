@@ -1696,11 +1696,11 @@ local function genEnum(enum)
 
         -- handle special cases where the name itself would break the string literal
         if name == '"' then
-            strRes = [['\"\"\"']]
+            strRes = [['"\""']]
         elseif name == "'" then
-            strRes = [['\"\'\"']]
+            strRes = [['"\'"']]
         elseif name == "\\" then
-            strRes = [['\"\\\\\"']]
+            strRes = [['"\\\\\\\\"']]
         end
 
         -- Escape # as well since it can break the comment formatting

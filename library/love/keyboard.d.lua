@@ -50,11 +50,11 @@ love.keyboard = {}
 ---| '"9"' # The nine key
 ---| '"space"' # Space key
 ---| '"!"' # Exclamation mark key
----| '\"\"\"' # Double quote key
+---| '"\""' # Double quote key
 ---| '"\35"' # Hash key
 ---| '"$"' # Dollar key
 ---| '"&"' # Ampersand key
----| '\"\'\"' # Single quote key
+---| '"\'"' # Single quote key
 ---| '"("' # Left parenthesis key
 ---| '")"' # Right parenthesis key
 ---| '"*"' # Asterisk key
@@ -71,7 +71,7 @@ love.keyboard = {}
 ---| '"?"' # Question mark key
 ---| '"@"' # At sign key
 ---| '"["' # Left square bracket key
----| '\"\\\\\"' # Backslash key
+---| '"\\\\\\\\"' # Backslash key
 ---| '"]"' # Right square bracket key
 ---| '"^"' # Caret key
 ---| '"_"' # Underscore key
@@ -213,10 +213,10 @@ love.keyboard = {}
 ---| '"="' # The equals key on an American layout.
 ---| '"["' # The left-bracket key on an American layout.
 ---| '"]"' # The right-bracket key on an American layout.
----| '\"\\\\\"' # The backslash key on an American layout.
+---| '"\\\\\\\\"' # The backslash key on an American layout.
 ---| '"nonus\35"' # The non-U.S. hash scancode.
 ---| '";"' # The semicolon key on an American layout.
----| '\"\'\"' # The apostrophe key on an American layout.
+---| '"\'"' # The apostrophe key on an American layout.
 ---| '"`"' # The back-tick / grave key on an American layout.
 ---| '","' # The comma key on an American layout.
 ---| '"."' # The period key on an American layout.

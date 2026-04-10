@@ -440,8 +440,8 @@ function Transform:translate(dx, dy) end
 ---[Open in Browser](https://love2d.org/wiki/MatrixLayout)
 ---
 ---@alias love.MatrixLayout
----| '"row"' # The matrix is row-major:
----| '"column"' # The matrix is column-major:
+---| "row" # The matrix is row-major:
+---| "column" # The matrix is column-major:
 
 ---Converts a color from 0..255 to 0..1 range.
 ---

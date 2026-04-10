@@ -2636,34 +2636,34 @@ function World:update(dt, velocityiterations, positioniterations) end
 ---[Open in Browser](https://love2d.org/wiki/BodyType)
 ---
 ---@alias love.BodyType
----| '"static"' # Static bodies do not move.
----| '"dynamic"' # Dynamic bodies collide with all bodies.
----| '"kinematic"' # Kinematic bodies only collide with dynamic bodies.
+---| "static" # Static bodies do not move.
+---| "dynamic" # Dynamic bodies collide with all bodies.
+---| "kinematic" # Kinematic bodies only collide with dynamic bodies.
 
 ---Different types of joints.
 ---
 ---[Open in Browser](https://love2d.org/wiki/JointType)
 ---
 ---@alias love.JointType
----| '"distance"' # A DistanceJoint.
----| '"friction"' # A FrictionJoint.
----| '"gear"' # A GearJoint.
----| '"mouse"' # A MouseJoint.
----| '"prismatic"' # A PrismaticJoint.
----| '"pulley"' # A PulleyJoint.
----| '"revolute"' # A RevoluteJoint.
----| '"rope"' # A RopeJoint.
----| '"weld"' # A WeldJoint.
+---| "distance" # A DistanceJoint.
+---| "friction" # A FrictionJoint.
+---| "gear" # A GearJoint.
+---| "mouse" # A MouseJoint.
+---| "prismatic" # A PrismaticJoint.
+---| "pulley" # A PulleyJoint.
+---| "revolute" # A RevoluteJoint.
+---| "rope" # A RopeJoint.
+---| "weld" # A WeldJoint.
 
 ---The different types of Shapes, as returned by Shape:getType.
 ---
 ---[Open in Browser](https://love2d.org/wiki/ShapeType)
 ---
 ---@alias love.ShapeType
----| '"circle"' # The Shape is a CircleShape.
----| '"polygon"' # The Shape is a PolygonShape.
----| '"edge"' # The Shape is a EdgeShape.
----| '"chain"' # The Shape is a ChainShape.
+---| "circle" # The Shape is a CircleShape.
+---| "polygon" # The Shape is a PolygonShape.
+---| "edge" # The Shape is a EdgeShape.
+---| "chain" # The Shape is a ChainShape.
 
 ---Returns the two closest points between two fixtures and their distance.
 ---

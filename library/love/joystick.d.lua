@@ -222,57 +222,57 @@ function Joystick:setVibration(left, right, duration) end
 ---[Open in Browser](https://love2d.org/wiki/GamepadAxis)
 ---
 ---@alias love.GamepadAxis
----| '"leftx"' # The x-axis of the left thumbstick.
----| '"lefty"' # The y-axis of the left thumbstick.
----| '"rightx"' # The x-axis of the right thumbstick.
----| '"righty"' # The y-axis of the right thumbstick.
----| '"triggerleft"' # Left analog trigger.
----| '"triggerright"' # Right analog trigger.
+---| "leftx" # The x-axis of the left thumbstick.
+---| "lefty" # The y-axis of the left thumbstick.
+---| "rightx" # The x-axis of the right thumbstick.
+---| "righty" # The y-axis of the right thumbstick.
+---| "triggerleft" # Left analog trigger.
+---| "triggerright" # Right analog trigger.
 
 ---Virtual gamepad buttons.
 ---
 ---[Open in Browser](https://love2d.org/wiki/GamepadButton)
 ---
 ---@alias love.GamepadButton
----| '"a"' # Bottom face button (A).
----| '"b"' # Right face button (B).
----| '"x"' # Left face button (X).
----| '"y"' # Top face button (Y).
----| '"back"' # Back button.
----| '"guide"' # Guide button.
----| '"start"' # Start button.
----| '"leftstick"' # Left stick click button.
----| '"rightstick"' # Right stick click button.
----| '"leftshoulder"' # Left bumper.
----| '"rightshoulder"' # Right bumper.
----| '"dpup"' # D-pad up.
----| '"dpdown"' # D-pad down.
----| '"dpleft"' # D-pad left.
----| '"dpright"' # D-pad right.
+---| "a" # Bottom face button (A).
+---| "b" # Right face button (B).
+---| "x" # Left face button (X).
+---| "y" # Top face button (Y).
+---| "back" # Back button.
+---| "guide" # Guide button.
+---| "start" # Start button.
+---| "leftstick" # Left stick click button.
+---| "rightstick" # Right stick click button.
+---| "leftshoulder" # Left bumper.
+---| "rightshoulder" # Right bumper.
+---| "dpup" # D-pad up.
+---| "dpdown" # D-pad down.
+---| "dpleft" # D-pad left.
+---| "dpright" # D-pad right.
 
 ---Joystick hat positions.
 ---
 ---[Open in Browser](https://love2d.org/wiki/JoystickHat)
 ---
 ---@alias love.JoystickHat
----| '"c"' # Centered
----| '"d"' # Down
----| '"l"' # Left
----| '"ld"' # Left+Down
----| '"lu"' # Left+Up
----| '"r"' # Right
----| '"rd"' # Right+Down
----| '"ru"' # Right+Up
----| '"u"' # Up
+---| "c" # Centered
+---| "d" # Down
+---| "l" # Left
+---| "ld" # Left+Down
+---| "lu" # Left+Up
+---| "r" # Right
+---| "rd" # Right+Down
+---| "ru" # Right+Up
+---| "u" # Up
 
 ---Types of Joystick inputs.
 ---
 ---[Open in Browser](https://love2d.org/wiki/JoystickInputType)
 ---
 ---@alias love.JoystickInputType
----| '"axis"' # Analog axis.
----| '"button"' # Button.
----| '"hat"' # 8-direction hat value.
+---| "axis" # Analog axis.
+---| "button" # Button.
+---| "hat" # 8-direction hat value.
 
 ---Gets the full gamepad mapping string of the Joysticks which have the given GUID, or nil if the GUID isn't recognized as a gamepad.
 ---

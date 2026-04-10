@@ -1692,20 +1692,20 @@ end
 
 local function genEnum(enum)
     local function processString(name)
-        local strRes = "'\"" .. name .. "\"'"
+        local strRes = "\"" .. name .. "\""
 
         -- handle special cases where the name itself would break the string literal
         if name == '"' then
-            strRes = [['"\""']]
+            strRes = '"\\""'
         elseif name == "'" then
-            strRes = [['"\'"']]
+            strRes = '"\'"'
         elseif name == "\\" then
-            strRes = [['"\\\\\\\\"']]
+            strRes = '"\\92\\92"'
         end
 
         -- Escape # as well since it can break the comment formatting
         if name:find("#") then
-            strRes = "'\"" .. name:gsub("#", "\\35") .. "\"'"
+            strRes = "\"" .. name:gsub("#", "\\35") .. "\""
         end
 
         return strRes
@@ -1722,6 +1722,10 @@ local function genEnum(enum)
     for _, const in ipairs(enum.constants) do
         local name = tostring(const.name)
         code = code .. "---| " .. processString(name) .. " # " .. stripNewlines(const.description) .. "\n"
+        -- fix issues when LSP see only `\` but in autocompletion `\\`
+        if name == "\\" then
+            code = code .. "---| '\\92' # 🚫 NOT INSERTABLE — documentation reference only\n"
+        end
     end
     code = code .. "\n"
     return code

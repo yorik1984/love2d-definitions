@@ -12,11 +12,11 @@ love.system = {}
 ---[Open in Browser](https://love2d.org/wiki/PowerState)
 ---
 ---@alias love.PowerState
----| '"unknown"' # Cannot determine power status.
----| '"battery"' # Not plugged in, running on a battery.
----| '"nobattery"' # Plugged in, no battery available.
----| '"charging"' # Plugged in, charging battery.
----| '"charged"' # Plugged in, battery is fully charged.
+---| "unknown" # Cannot determine power status.
+---| "battery" # Not plugged in, running on a battery.
+---| "nobattery" # Plugged in, no battery available.
+---| "charging" # Plugged in, charging battery.
+---| "charged" # Plugged in, battery is fully charged.
 
 ---Gets text from the clipboard.
 ---

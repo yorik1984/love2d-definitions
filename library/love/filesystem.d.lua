@@ -218,37 +218,37 @@ function FileData:getFilename() end
 ---[Open in Browser](https://love2d.org/wiki/BufferMode)
 ---
 ---@alias love.BufferMode
----| '"none"' # No buffering. The result of write and append operations appears immediately.
----| '"line"' # Line buffering. Write and append operations are buffered until a newline is output or the buffer size limit is reached.
----| '"full"' # Full buffering. Write and append operations are always buffered until the buffer size limit is reached.
+---| "none" # No buffering. The result of write and append operations appears immediately.
+---| "line" # Line buffering. Write and append operations are buffered until a newline is output or the buffer size limit is reached.
+---| "full" # Full buffering. Write and append operations are always buffered until the buffer size limit is reached.
 
 ---How to decode a given FileData.
 ---
 ---[Open in Browser](https://love2d.org/wiki/FileDecoder)
 ---
 ---@alias love.FileDecoder
----| '"file"' # The data is unencoded.
----| '"base64"' # The data is base64-encoded.
+---| "file" # The data is unencoded.
+---| "base64" # The data is base64-encoded.
 
 ---The different modes you can open a File in.
 ---
 ---[Open in Browser](https://love2d.org/wiki/FileMode)
 ---
 ---@alias love.FileMode
----| '"r"' # Open a file for read.
----| '"w"' # Open a file for write.
----| '"a"' # Open a file for append.
----| '"c"' # Do not open a file (represents a closed file.)
+---| "r" # Open a file for read.
+---| "w" # Open a file for write.
+---| "a" # Open a file for append.
+---| "c" # Do not open a file (represents a closed file.)
 
 ---The type of a file.
 ---
 ---[Open in Browser](https://love2d.org/wiki/FileType)
 ---
 ---@alias love.FileType
----| '"file"' # Regular file.
----| '"directory"' # Directory.
----| '"symlink"' # Symbolic link.
----| '"other"' # Something completely different like a device.
+---| "file" # Regular file.
+---| "directory" # Directory.
+---| "symlink" # Symbolic link.
+---| "other" # Something completely different like a device.
 
 ---Append data to an existing file.
 ---

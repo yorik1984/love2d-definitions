@@ -74,7 +74,7 @@ jobs:
       - name: Generate API
         run: |
           echo "🔧 Generating LOVE API..."
-          lua genLOVE2dAPI.lua
+          lua genLOVE2dAPI.lua STATS
           echo "📊 Generated $(find library -name "*.d.lua" | wc -l) files"
         shell: bash
 

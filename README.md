@@ -101,32 +101,8 @@ The workflow automatically:
 
 ### 📋 What Gets Generated
 
-The generator creates files for all LÖVE modules:
-
-```
-library/
-├── love.d.lua              # Core module with global definitions and root namespace
-└── love/                   # Directory containing all LÖVE submodules
-    ├── audio.d.lua         # Audio module - sound playback, recording, and effects
-    ├── data.d.lua          # Data module - compression, encoding, and data containers
-    ├── event.d.lua         # Event module - input events and system messages
-    ├── filesystem.d.lua    # Filesystem module - file I/O and directory operations
-    ├── font.d.lua          # Font module - text rendering and font management
-    ├── graphics.d.lua      # Graphics module - drawing, shaders, and rendering
-    ├── image.d.lua         # Image module - image loading and pixel manipulation
-    ├── joystick.d.lua      # Joystick module - game controller input handling
-    ├── keyboard.d.lua      # Keyboard module - keyboard input and key states
-    ├── math.d.lua          # Math module - vectors, matrices, and geometric operations
-    ├── mouse.d.lua         # Mouse module - mouse input and cursor handling
-    ├── physics.d.lua       # Physics module - Box2D physics simulation
-    ├── sound.d.lua         # Sound module - audio sources and decoding
-    ├── system.d.lua        # System module - OS interaction and system info
-    ├── thread.d.lua        # Thread module - multithreading support
-    ├── timer.d.lua         # Timer module - time measurement and delays
-    ├── touch.d.lua         # Touch module - touchscreen input
-    ├── video.d.lua         # Video module - video playback
-    └── window.d.lua        # Window module - window management and display modes
-```
+The generator creates files for all LÖVE modules.
+For a complete statistics and list of generated files, see [STATS.md](./STATS.md).
 
 Each file contains:
 
@@ -169,6 +145,9 @@ lua genLOVE2dAPI.lua DEBUG "my_luacats_api"
 
 # Show help
 lua genLOVE2dAPI.lua HELP
+
+# Add  statistics to `STATS.md`, create if not present
+lua genLOVEsnippets.lua STATS
 ```
 
 ## 🆚 Improvements

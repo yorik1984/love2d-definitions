@@ -60,6 +60,7 @@ USAGE:
 
 OPTIONS:
     DEBUG             - Show debug information about type collection
+    STATS             - Add  statistics to `STATS.md`
     HELP              - Display this help message
 
 COMMANDS:
@@ -424,6 +425,7 @@ USAGE:
 
 OPTIONS:
     DEBUG             - Show debug information about type collection
+    STATS             - Add  statistics to `STATS.md`
     HELP              - Display this help message
 
 COMMANDS:
@@ -479,6 +481,7 @@ local API = {
     -- definition files *.d.lua for documentation and not implementation code.
     LIB_FILE_EXT   = "d.lua",
     OUTPUT_DIR     = "library",
+    STATS_FILE     = "STATS.md",
     WIKI_LINK_NAME = "Open in Browser",
     WIKI_LINK_URL  = "https://love2d.org/wiki/",
 }
@@ -527,7 +530,36 @@ local function isEmpty(s)
     return s == nil or (type(s) == "string" and s:match("^%s*$") ~= nil)
 end
 
-local function first_sentence(s)
+local function firstSentence(s)
+    if isEmpty(s) then
+        return ""
+    end
+
+    local function isE_G(pos)
+        local before = s:sub(math.max(1, pos - 3), pos - 1)
+        return before:match("e%.$") or before:match("e %.$") or before:match("e%.g$")
+    end
+
+    local pos = 1
+    while pos <= #s do
+        local dot = s:find("%. ", pos)
+        local newline = s:find("[\n]", pos)
+
+        if not dot and not newline then break end
+
+        local p = dot and newline and math.min(dot, newline) or dot or newline
+
+        if s:sub(p, p) == "." and isE_G(p) then
+            pos = p + 1
+        else
+            return s:sub(1, p - (s:sub(p, p) == "\n" and 1 or 0))
+        end
+    end
+
+    return s
+end
+
+local function firstLongSentence(s)
     if isEmpty(s) then
         return ""
     end
@@ -541,7 +573,7 @@ local function trim(s)
         return ""
     end
 
-    return first_sentence(s)
+    return firstLongSentence(s)
 end
 
 local function trimParam(s)
@@ -670,11 +702,27 @@ local function createDirectory(path)
 end
 
 local debugMode = false
+local function debugPrint(...)
+    if debugMode then
+        io.write("\n 🔧 DEBUG: ", ...)
+        io.write("\n")
+    end
+end
+
+local function errorPrint(...)
+    io.stderr:write("\n  ❌ Error: ", ...)
+    io.stderr:write("\n")
+    os.exit(1)
+end
+
+local statsMode = false
 local outputDir = API.OUTPUT_DIR
 for i = 1, #arg do
     local a = arg[i]
     if a == "DEBUG" then
         debugMode = true
+    elseif a == "STATS" then
+        statsMode = true
     elseif a == "HELP" then
         io.write(HELP_TEXT, "\n")
         os.exit(0)
@@ -689,8 +737,8 @@ local ok, apiRequire = pcall(function()
     return require(API.FILE)
 end)
 if not ok then
-    io.stderr:write(
-        " ❌ Error: could not require '"
+    errorPrint(
+        "could not require '"
         .. API.FILE
         .. "'. Make sure "
         .. API.FILE
@@ -698,9 +746,17 @@ if not ok then
         .. API.FILE_EXT
         .. " is present in the current directory\n"
     )
-    os.exit(1)
 elseif debugMode then
-    print(" ✅ Successfully loaded " .. API.FILE .. API.FILE_EXT .. "\n")
+    print(" ✅ Successfully loaded " .. API.FILE .. "." .. API.FILE_EXT .. "\n")
+end
+
+if debugMode then
+    print(string.format(
+        [[
+ Debug mode: ENABLE
+ Output directory: %s]],
+        outputDir
+    ))
 end
 
 createDirectory(outputDir)
@@ -1003,7 +1059,7 @@ collectTypes(apiRequire)
 
 -- Ensure common plural forms are recorded so DEBUG shows them (per your example)
 local function printDebugInfo()
-    print("DEBUG: All collected types (" .. countTable(knownTypes) .. " total):")
+    debugPrint("All collected types (" .. countTable(knownTypes) .. " total):")
     local tmp = {}
     for k in pairs(knownTypes) do
         tmp[#tmp + 1] = k
@@ -1014,7 +1070,7 @@ local function printDebugInfo()
     end
     print("")
 
-    print("DEBUG: Plural forms found in API (will be converted to arrays):")
+    debugPrint("Plural forms found in API (will be converted to arrays):")
     local tmpPlural = {}
     for k, v in pairs(pluralTypes) do
         tmpPlural[#tmpPlural + 1] = { k = k, v = v }
@@ -1025,10 +1081,10 @@ local function printDebugInfo()
     for _, it in ipairs(tmpPlural) do
         print("  - " .. it.k .. " → " .. it.v .. "[]")
     end
-    print("Total plural forms: " .. countTable(pluralTypes))
+    print(" Total plural forms: " .. countTable(pluralTypes))
     print("")
 
-    print("DEBUG: Types starting with capital letter (defined in type files):")
+    debugPrint("Types starting with capital letter (defined in type files):")
     local definedCap = {}
     for k in pairs(definedTypes) do
         local first = k:sub(1, 1)
@@ -1040,10 +1096,10 @@ local function printDebugInfo()
     for _, v in ipairs(definedCap) do
         print("  - " .. API.NAME .. "." .. v)
     end
-    print("Total defined capital letter types: " .. #definedCap)
+    print(" Total defined capital letter types: " .. #definedCap)
     print("")
 
-    print("DEBUG: Types starting with capital letter (used but NOT defined):")
+    debugPrint("Types starting with capital letter (used but NOT defined):")
     local undef = {}
     for k in pairs(knownTypes) do
         if not definedTypes[k] then
@@ -1061,7 +1117,7 @@ local function printDebugInfo()
             seen[v] = true
         end
     end
-    print("Total undefined capital letter types: " .. countTable(seen))
+    print(" Total undefined capital letter types: " .. countTable(seen))
     print("")
 end
 
@@ -1228,7 +1284,7 @@ local function genClassForTable(module, func, param, fields, desc, static)
                 -- description (first sentence) for the field itself + default if present
                 local fldDesc = ""
                 if f.description and f.description ~= "" then
-                    fldDesc = first_sentence(f.description)
+                    fldDesc = firstLongSentence(f.description)
                 end
 
                 fldDesc = (f.default ~= nil) and appendDefaultDesc(fldDesc, f.default) or fldDesc
@@ -1559,7 +1615,7 @@ local function genFunction(moduleName, fun, static)
                     local rType, rClassName = getReturnType(r, moduleName, fun.name, ri, static)
                     local rDesc, rName = "", ""
                     if r.description and tostring(r.description) ~= "" then
-                        rDesc = " " .. first_sentence(r.description)
+                        rDesc = " " .. firstLongSentence(r.description)
                     end
 
                     if r.name and tostring(r.name) ~= "" and r.name ~= "..." then
@@ -1732,7 +1788,7 @@ local function genEnum(enum)
 end
 
 local function genModule(name, api, outDir)
-    print("Generating module " .. name)
+    print(" Generating module " .. name)
 
     local filePath = API.NAME
     if name ~= API.NAME then
@@ -1799,8 +1855,64 @@ local function genModule(name, api, outDir)
     f:close()
 end
 
-genModule(API.NAME, apiRequire, API.OUTPUT_DIR)
+local function genStatsMarkdown(api, outDir)
+    local lines          = {}
+
+    local apiTopFileName = "├─ " .. API.NAME .. "." .. API.LIB_FILE_EXT
+    local apiSubDirName  = "╰─ " .. API.NAME .. "/"
+
+    local function collectLines(module, prefix)
+        for i, sub in ipairs(module.modules or {}) do
+            local isLast      = (i == #module.modules)
+            local connector   = isLast and "   " or "│  "
+            local branch      = isLast and "╰─ " or "├─ "
+            local description = firstSentence(sub.description)
+            local line        = prefix .. branch .. sub.name .. "." .. API.LIB_FILE_EXT
+            table.insert(lines, { text = line, desc = description })
+            collectLines(sub, prefix .. connector)
+        end
+    end
+
+    collectLines(api, "    ")
+
+    local maxLen = 0
+    for _, item in ipairs(lines) do
+        local len = #item.text
+        if len > maxLen then
+            maxLen = len
+        end
+    end
+
+    if #apiTopFileName > maxLen then maxLen = #apiTopFileName end
+    if #apiSubDirName > maxLen then maxLen = #apiSubDirName end
+
+    local alignPos = maxLen + 2
+
+    local f = assert(io.open(API.STATS_FILE, "w"))
+    local function writeLine(line, comment)
+        local padding = string.rep(" ", alignPos - #line)
+        f:write(line .. padding .. "# " .. comment .. "\n")
+    end
+
+    f:write("## File structure\n\n")
+    f:write("```bash\n" .. outDir .. "/\n")
+    writeLine(apiTopFileName, "Core module with global definitions and root namespace")
+    writeLine(apiSubDirName, "Directory containing all LÖVE submodules")
+
+    for _, item in ipairs(lines) do
+        writeLine(item.text, item.desc)
+    end
+
+    f:write("```\n")
+    f:close()
+end
+
+genModule(API.NAME, apiRequire, outputDir)
+
+if statsMode then
+    genStatsMarkdown(apiRequire, outputDir)
+end
 
 local completed = os.clock() - time
-print("--------")
-print("Completed in " .. (completed * 1000) .. "ms.")
+print(" --------")
+print(" Completed in " .. (completed * 1000) .. "ms.")

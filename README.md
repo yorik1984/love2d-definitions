@@ -12,7 +12,6 @@
 ## Table of Contents
 
 - [🚀 Features](#-features)
-  - [Compatibility](#compatibility)
   - [Automatic API Generation](#automatic-api-generation)
   - [Enhanced Type System](#enhanced-type-system)
   - [Improved Generation](#improved-generation)
@@ -23,8 +22,8 @@
   - [📋 What Gets Generated](#-what-gets-generated)
   - [✋ Manual Generation (Optional)](#-manual-generation-optional)
 - [🆚 Improvements](#-improvements)
-  - [Architectural Improvements](#architectural-improvements)
-  - [Generation Improvements](#generation-improvements)
+  - [Architectural](#architectural)
+  - [Generation](#generation)
 - [📚 References & Related Projects](#-references--related-projects)
 - [🙏 Credits](#-credits)
 - [📄 License](#-license)
@@ -102,32 +101,8 @@ The workflow automatically:
 
 ### 📋 What Gets Generated
 
-The generator creates files for all LÖVE modules:
-
-```
-library/
-├── love.d.lua              # Core module with global definitions and root namespace
-└── love/                   # Directory containing all LÖVE submodules
-    ├── audio.d.lua         # Audio module - sound playback, recording, and effects
-    ├── data.d.lua          # Data module - compression, encoding, and data containers
-    ├── event.d.lua         # Event module - input events and system messages
-    ├── filesystem.d.lua    # Filesystem module - file I/O and directory operations
-    ├── font.d.lua          # Font module - text rendering and font management
-    ├── graphics.d.lua      # Graphics module - drawing, shaders, and rendering
-    ├── image.d.lua         # Image module - image loading and pixel manipulation
-    ├── joystick.d.lua      # Joystick module - game controller input handling
-    ├── keyboard.d.lua      # Keyboard module - keyboard input and key states
-    ├── math.d.lua          # Math module - vectors, matrices, and geometric operations
-    ├── mouse.d.lua         # Mouse module - mouse input and cursor handling
-    ├── physics.d.lua       # Physics module - Box2D physics simulation
-    ├── sound.d.lua         # Sound module - audio sources and decoding
-    ├── system.d.lua        # System module - OS interaction and system info
-    ├── thread.d.lua        # Thread module - multithreading support
-    ├── timer.d.lua         # Timer module - time measurement and delays
-    ├── touch.d.lua         # Touch module - touchscreen input
-    ├── video.d.lua         # Video module - video playback
-    └── window.d.lua        # Window module - window management and display modes
-```
+The generator creates files for all LÖVE modules.
+For a complete statistics and list of generated files, see [STATS.md](./STATS.md).
 
 Each file contains:
 
@@ -170,6 +145,9 @@ lua genLOVE2dAPI.lua DEBUG "my_luacats_api"
 
 # Show help
 lua genLOVE2dAPI.lua HELP
+
+# Add  statistics to `STATS.md`, create if not present
+lua genLOVEsnippets.lua STATS
 ```
 
 ## 🆚 Improvements
@@ -198,7 +176,14 @@ lua genLOVE2dAPI.lua HELP
 
 ## 📚 References & Related Projects
 
-+ **[love2d-tresitter.nvim](https://github.com/yorik1984/love2d-treesitter.nvim)**<br>
++ **[love2d-snippets](https://github.com/yorik1984/love2d-snippets)** <br>
+    A snippet generator and collection for the LÖVE framework, compatible with VS Code, Neovim (via LuaSnip), and any editor that supports VS Code-style snippets.
+    *   **🤖 Automated Updates:** GitHub Actions parses the official love-api and generates up-to-date snippets whenever the API changes.
+    *   **📦 Full API Coverage:** Includes snippets for all modules, functions, callbacks, type methods, constructors, getters/setters, enums, and `conf.lua`.
+    *   **⌨️ Tabs for Indentation:** Uses tab characters (`\t`) for indentation, allowing each developer to configure their preferred display width (2, 4, 8 spaces, etc.) without changing the actual files.
+    *   **📌 Version Branches:** Repository branches match LÖVE versions (e.g., branch `11.5` for LÖVE 11.5), while the `main` branch always contains the latest API.
+
++ **[love2d-tresitter.nvim](https://github.com/yorik1984/love2d-treesitter.nvim)** <br>
 Is a comprehensive plugin for [Neovim](https://neovim.io/) that highlight [LÖVE](http://love2d.org) syntax in your editor.
 Provides complete LÖVE API syntax highlighting for LÖVE functions, modules, types, and callbacks, with full **[Treesitter](https://github.com/nvim-treesitter/nvim-treesitter)** support.
     * **🤖 Automated Updates:** Uses GitHub Actions to stay in sync with the official love-api, just like this definitions.
@@ -206,13 +191,13 @@ Provides complete LÖVE API syntax highlighting for LÖVE functions, modules, ty
     * **📌 Version Branches:** Maintains version-specific branches (e.g., `11.5`) to match different LÖVE releases.
 
 > [!TIP]
-> Use **love2d-treesitter** alongside this definitions for the ultimate LÖVE development setup — get beautiful syntax highlighting in [Neovim](https://neovim.io/) and intelligent IDE autocompletion from these LuaCATS annotations.
+> Use **love2d-treesitter** and **love2d-snippets** alongside this definitions for the ultimate LÖVE development setup — get beautiful syntax highlighting in [Neovim](https://neovim.io/) and intelligent IDE autocompletion from these LuaCATS annotations.
 
-+ **[love2d-docs.nvim](https://github.com/yorik1984/love2d-docs.nvim)**<br>
++ **[love2d-docs.nvim](https://github.com/yorik1984/love2d-docs.nvim)** <br>
 Is a comprehensive plugin for [Neovim](https://neovim.io/) and [Vim](https://www.vim.org/) that brings the entire [LÖVE](http://love2d.org) game framework documentation right into your editor.
     - 📖 **Built-in Help** — Complete LÖVE API documentation accessible via `:help LOVE-*`
 
-+ **[love2d-vim-syntax](https://github.com/yorik1984/love2d-vim-syntax)**<br>
++ **[love2d-vim-syntax](https://github.com/yorik1984/love2d-vim-syntax)** <br>
 Plugin for [Vim](https://www.vim.org/) that highlight [LÖVE](http://love2d.org) syntax in your editor.
     - 🎨 **Syntax Highlighting** — Colors LÖVE functions, modules, types, and callbacks
     - 🔧 **Customizable** — Flexible styling options for Vim

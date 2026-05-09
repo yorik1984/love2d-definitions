@@ -3002,13 +3002,11 @@ function love.graphics.newImage(filename, settings) end
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.graphics.newImageFont)
 ---
----Instead of using this function, consider using a BMFont generator such as bmfont, littera, or bmGlyph with love.graphics.newFont. Because slime said it was better.
 ---@param filename string The filepath to the image file.
 ---@param glyphs string A string of the characters in the image in order from left to right.
----@param extraspacing number Additional spacing (positive or negative) to apply to each glyph in the Font.
+---@param extraspacing number? Additional spacing (positive or negative) to apply to each glyph in the Font. (defaults to `0`).
 ---@return love.Font font A Font object which can be used to draw text on screen.
----@overload fun(imageData: love.ImageData, glyphs: string): love.Font
----@overload fun(filename: string, glyphs: string): love.Font
+---@overload fun(imageData: love.ImageData, glyphs: string, extraspacing: number?): love.Font
 function love.graphics.newImageFont(filename, glyphs, extraspacing) end
 
 ---Options for `love.graphics.newMesh`.

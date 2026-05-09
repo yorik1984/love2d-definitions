@@ -417,6 +417,7 @@ function love.keyboard.hasTextInput() end
 ---@param key love.KeyConstant A key to check.
 ---@return boolean anyDown True if any supplied key is down, false if not.
 ---@overload fun(key: love.KeyConstant): boolean
+---@overload fun(keys: table): boolean
 function love.keyboard.isDown(key, ...) end
 
 ---Checks whether the specified Scancodes are pressed. Not to be confused with love.keypressed or love.keyreleased.
